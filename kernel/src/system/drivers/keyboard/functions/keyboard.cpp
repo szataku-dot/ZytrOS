@@ -10,9 +10,14 @@
 #include "libs/libc/libc.h"
 #include "libs/asm/asm.h"
 #include "system/sysfunc/history.h"
+#include "system/gui/gui.h"
 
 char command_buffer[64];
 size_t cmd_idx = 0;
+
+bool shift_pressed = false;
+bool extended_scancode = false;
+bool shell_input_enabled = true;
 
 char scancode_to_ascii_normal(uint8_t scancode) {
     switch (scancode) {
@@ -154,15 +159,9 @@ void handle_keyboard()
         // Left Windows
         if (scancode == 0x5B) {
             if (!is_menu_start_open) {
-                clear_line();
-                print("Start menu opened\n");
-                print_cmd();
-                is_menu_start_open = true;
+                open_start_menu();
             } else {
-                clear_line();
-                print("Start menu closed\n");
-                print_cmd();
-                is_menu_start_open = false;
+                close_start_menu();
             }
             return;
         }
@@ -170,15 +169,9 @@ void handle_keyboard()
         // Right Windows
         if (scancode == 0x5C) {
             if (!is_menu_start_open) {
-                clear_line();
-                print("Start menu opened\n");
-                print_cmd();
-                is_menu_start_open = true;
+                open_start_menu();
             } else {
-                clear_line();
-                print("Start menu closed\n");
-                print_cmd();
-                is_menu_start_open = false;
+                close_start_menu();
             }
             return;
         }
@@ -253,17 +246,12 @@ void handle_keyboard()
     if (scancode == 0x1C) {
         if (is_mouse_over_start(mouse_x, mouse_y)) {
             if (!is_menu_start_open) {
-                clear_line();
-                print("Start menu opened\n");
-                print_cmd();
-                is_menu_start_open = true;
+                open_start_menu();
             } else {
-                clear_line();
-                print("Start menu closed\n");
-                print_cmd();
-                is_menu_start_open = false;
+                close_start_menu();
             }
-        } else {
+        } 
+        else if(shell_input_enabled) {
             command_buffer[cmd_idx] = '\0';
             
             history_add(command_buffer);
@@ -277,18 +265,21 @@ void handle_keyboard()
         return;
     }
 
-    // 7. ZWYKŁE ZNAKI
-    char c = shift_pressed
-        ? scancode_to_ascii_shift(scancode)
-        : scancode_to_ascii_normal(scancode);
+    if(shell_input_enabled) {
+        print("nfd");
+        // 7. ZWYKŁE ZNAKI
+        char c = shift_pressed
+            ? scancode_to_ascii_shift(scancode)
+            : scancode_to_ascii_normal(scancode);
 
-    if (c && cmd_idx < 63) {
-        command_buffer[cmd_idx++] = c;
+        if (c && cmd_idx < 63) {
+            command_buffer[cmd_idx++] = c;
 
-        restore_mouse_backdrop();
-        print_char8(c);
-        save_mouse_backdrop();
-        draw_mouse_cursor();
-        render_frame();
+            restore_mouse_backdrop();
+            print_char8(c);
+            save_mouse_backdrop();
+            draw_mouse_cursor();
+            render_frame();
+        }
     }
 }

@@ -116,12 +116,13 @@ extern "C" void kmain() {
     for (;;) {
         update_gui_state(mouse_x, mouse_y);
 
-        updateTime();
+        update_gui();
 
         handle_keyboard();
         handle_mouse();
 
         render_frame();
+
     }
 }
 

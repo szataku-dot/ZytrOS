@@ -50,7 +50,7 @@ void clear_screen() {
     size_t bar_start = backbuffer_height - bar_height;
 
     for (size_t y = 0; y < backbuffer_height; y++) {
-        uint32_t c = (y >= bar_start) ? COLOR_DARK_GRAY : COLOR_ZYTR_BG;
+        uint32_t c = (y >= bar_start) ? COLOR_DARK_GRAY : COLOR_NASUA_BG;
 
         for (size_t x = 0; x < backbuffer_width; x++) {
             bb_ptr[y * backbuffer_pitch + x] = c;

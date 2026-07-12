@@ -99,7 +99,7 @@ void update_bottom_bar() {
 
     for (size_t y = start_y; y < fb->height; y++) {
         for (size_t x = 0; x < fb->width; x++) {
-            bb_ptr[y * pitch + x] = COLOR_DARK_GRAY;
+            bb_ptr[y * pitch + x] = COLOR_NASUA_TASKBAR;
         }
     }
 
@@ -109,7 +109,15 @@ void update_bottom_bar() {
     draw_start_button(5, start_y + 2);
 }
 
-void updateTime() {
+void update_start() {
+    size_t bar_h = 36;
+    size_t start_y = fb->height - bar_h;
+
+    fill_block(0, start_y, COLOR_NASUA_TASKBAR, 50, 36);
+    draw_start_button(5, start_y + 2);
+}
+
+void update_time() {
     RtcTime time = get_rtc_time();
 
     char time_buf[9];
@@ -145,14 +153,17 @@ void updateTime() {
     size_t start_y = fb->height - bar_h;
 
     // ---------------- CLEAR (poprawne) ----------------
-    fill_block(text_x, start_y + 7, COLOR_DARK_GRAY, 100, 10);
-    fill_block(text_x, start_y + 19, COLOR_DARK_GRAY, 100, 10);
-    fill_block(0, start_y, COLOR_DARK_GRAY, 50, 36);
+    fill_block(text_x, start_y + 7, COLOR_NASUA_TASKBAR, 100, 10);
+    fill_block(text_x, start_y + 19, COLOR_NASUA_TASKBAR, 100, 10);
 
     // ---------------- DRAW ----------------
     print_at8(time_buf, text_x, start_y + 8, COLOR_WHITE);
     print_at8(date_buf, text_x, start_y + 20, COLOR_WHITE);
-    draw_start_button(5, start_y + 2);
+}
+
+void update_gui() {
+    update_start();
+    update_time();
 }
 
 void draw_rect(int x1, int y1, int x2, int y2, uint32_t color) {
@@ -173,8 +184,8 @@ void draw_rect(int x1, int y1, int x2, int y2, uint32_t color) {
     int pixels_per_pitch = get_backbuffer_pitch();
 
     // 4. Rysowanie prostokąta
-    for (int y = y1; y <= y2; ++y) {
-        for (int x = x1; x <= x2; ++x) {
+    for (int y = y1; y < y2; ++y) {
+        for (int x = x1; x < x2; ++x) {
             bb_ptr[y * pixels_per_pitch + x] = color;
         }
     }

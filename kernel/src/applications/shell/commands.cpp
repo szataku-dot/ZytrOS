@@ -705,8 +705,8 @@ void execute_command(const char *cmd) {
                     terminal.id = current_id;
                     current_id++;
                 }
-                if (shell_strncmp(app_name_buf, "zetedit", 7)) {
-                    draw_window(&zetedit);
+                if (shell_strncmp(app_name_buf, "suaedit", 7)) {
+                    draw_window(&suaedit);
                     terminal.id = current_id;
                     current_id++;
                 }

@@ -1,5 +1,6 @@
 #include "../driver.h"
 #include "system/drivers/mouse/driver.h"
+#include "system/gui/vars/colors.h"
 
 extern uint32_t mouse_backdrop[];
 
@@ -62,7 +63,7 @@ void draw_mouse_cursor() {
             char p = arrow_cursor[y][x];
 
             if (p == 'W')
-                bb_ptr[py * pitch + px] = 0xFFFFFFFF;
+                bb_ptr[py * pitch + px] = COLOR_MOUSE;
             else if (p == 'B')
                 bb_ptr[py * pitch + px] = 0x00000000;
         }

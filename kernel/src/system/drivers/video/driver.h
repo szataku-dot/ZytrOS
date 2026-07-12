@@ -48,7 +48,7 @@ void draw_char16(unsigned char c, size_t x, size_t y, uint32_t color);
 
 void print_num8(uint32_t num);
 
-void updateTime();
+void update_gui();
 void draw_rect(int x1, int y1, int x2, int y2, uint32_t color);
 
 void print_info(const char* msg);
@@ -78,4 +78,16 @@ struct window_struct {
     bool focused;
 };
 
+enum window_button
+{
+    BUTTON_NONE,
+    BUTTON_MINIMIZE,
+    BUTTON_MAXIMIZE,
+    BUTTON_CLOSE
+};
+
 void draw_window(window_struct* window);
+
+bool is_mouse_over_window(window_struct* window, int mouse_x, int mouse_y);
+bool is_mouse_over_window_title(window_struct* window, int mouse_x, int mouse_y);
+window_button get_window_button(window_struct* window, int mouse_x, int mouse_y);

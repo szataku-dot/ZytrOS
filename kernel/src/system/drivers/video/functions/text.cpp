@@ -214,7 +214,7 @@ void delete_last_char() {
     size_t x = cursor_x;
     size_t y = cursor_y;
 
-    uint32_t bg = COLOR_ZYTR_BG;
+    uint32_t bg = COLOR_NASUA_BG;
 
     for (int dy = 0; dy < 8; dy++) {
         for (uint32_t dx = 0; dx < 8 + FONT_SPACING_W; dx++) {
@@ -229,7 +229,7 @@ void clear_line() {
     uint32_t* bb_ptr = get_backbuffer();
     size_t pitch = get_backbuffer_pitch();
 
-    uint32_t bg = COLOR_ZYTR_BG;
+    uint32_t bg = COLOR_NASUA_BG;
 
     size_t start_x = cursor_x - (cmd_idx * (8 + FONT_SPACING_W));
     
