@@ -16,7 +16,7 @@
 #include "kernel/include/panic/kernel_panic.h"
 #include "kernel/include/logger/logger.hpp"
 
-#include "system/filesystem/ztrfs.h"
+#include "system/filesystem/clawfs.h"
 
 #include "libs/asm/asm.h"
 
@@ -252,7 +252,7 @@ void execute_command(const char *cmd) {
                 }
             }
 
-            ztrfs_create_file(file_name_n);
+            clawfs_create_file(file_name_n);
 
             print_info("Saved to file ");
             print(file_name_n);
@@ -367,19 +367,19 @@ void execute_command(const char *cmd) {
     }
     // 8. komenda: format
     else if(cmd_name_len == 6 && shell_strncmp(cmd,"format", 6)){
-        print_warn("Formatting ZTRFS...\n");
+        print_warn("Formatting CLAWFS...\n");
 
-        ztrfs_format();
+        clawfs_format();
 
         print_info("Done.\n");
     }
     // 9. komenda: dir
     else if(cmd_name_len == 3 && shell_strncmp(cmd, "dir", 3)){
-        ztrfs_dir();
+        clawfs_dir();
     }
     // 10. komenda: mount
     else if(cmd_name_len == 5 && shell_strncmp(cmd, "mount", 5)) {
-        ztrfs_exists();
+        clawfs_exists();
     }
     // 11. komenda: touch
     else if (cmd_name_len == 5 && shell_strncmp(cmd, "touch", 5)) {
@@ -408,7 +408,7 @@ void execute_command(const char *cmd) {
 
             // Sprawdzamy czy nazwa pliku nie jest pusta
             if (i > 0) {
-                ztrfs_create_file(name_buf);
+                clawfs_create_file(name_buf);
             } else {
                 print_error("Error: Filename cannot be empty!\n");
             }

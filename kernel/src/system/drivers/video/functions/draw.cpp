@@ -143,10 +143,12 @@ void updateTime() {
     // ---------------- CLEAR (poprawne) ----------------
     fill_block(text_x, start_y + 7, COLOR_DARK_GRAY, 100, 10);
     fill_block(text_x, start_y + 19, COLOR_DARK_GRAY, 100, 10);
+    fill_block(0, start_y, COLOR_DARK_GRAY, 50, 36);
 
     // ---------------- DRAW ----------------
     print_at8(time_buf, text_x, start_y + 8, COLOR_WHITE);
     print_at8(date_buf, text_x, start_y + 20, COLOR_WHITE);
+    draw_start_button(5, start_y + 2);
 }
 
 void draw_rect(int x1, int y1, int x2, int y2, uint32_t color) {

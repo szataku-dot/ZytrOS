@@ -1,5 +1,5 @@
 #include "../driver.h"
-#include "system/filesystem/ztrfs.h"
+#include "system/filesystem/clawfs.h"
 #include "libs/asm/asm.h"
 
 static uint64_t total_storage_bytes = 0;
@@ -91,15 +91,16 @@ void storage_init()
 
     uint8_t header_buffer[512] = {0};
 
-    disk_read_sector(ZTRFS_START_LBA, header_buffer);
+    disk_read_sector(CLAWFS_START_LBA, header_buffer);
 
-    ZTRFSHeader* header = (ZTRFSHeader*)header_buffer;
+    CLAWFSHeader* header = (CLAWFSHeader*)header_buffer;
 
-    if (header->signature[0] != 'Z' ||
-        header->signature[1] != 'T' ||
-        header->signature[2] != 'R' ||
-        header->signature[3] != 'F' ||
-        header->signature[4] != 'S')
+    if (header->signature[0] != 'C' ||
+        header->signature[1] != 'L' ||
+        header->signature[2] != 'A' ||
+        header->signature[3] != 'W' ||
+        header->signature[4] != 'F' ||
+        header->signature[5] != 'S')
     {
         used_storage_bytes = 0;
         return;

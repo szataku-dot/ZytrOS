@@ -4,7 +4,7 @@
 
 #include "system/drivers/drivers.h"
 #include "system/interrupts/interrupts.h"
-#include "system/filesystem/ztrfs.h"
+#include "system/filesystem/clawfs.h"
 
 #include "applications/shell/commands.h"
 
@@ -115,11 +115,13 @@ extern "C" void kmain() {
     // Główna pętla wywołań
     for (;;) {
         update_gui_state(mouse_x, mouse_y);
-        
+
         updateTime();
-        render_frame();
 
         handle_keyboard();
+        handle_mouse();
+
+        render_frame();
     }
 }
 

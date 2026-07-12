@@ -9,7 +9,7 @@
 #include "system/gui/icons/icons.h"
 #include "libs/libc/libc.h"
 #include "libs/asm/asm.h"
-#include "applications/sysfunc/history.h"
+#include "system/sysfunc/history.h"
 
 char command_buffer[64];
 size_t cmd_idx = 0;
@@ -212,7 +212,6 @@ void handle_keyboard()
                     mouse_x -= speed;
                 else if (scancode == 0x4D && mouse_x + 20 < (int)fb->width)
                     mouse_x += speed;
-
                 save_mouse_backdrop();
                 draw_mouse_cursor();
                 render_frame();

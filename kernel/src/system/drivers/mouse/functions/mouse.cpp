@@ -1,7 +1,8 @@
 #include "../driver.h"
+#include "system/drivers/video/driver.h"
 
-int32_t mouse_x = 140;
-int32_t mouse_y = 150;
+int32_t mouse_x = 200;
+int32_t mouse_y = 145;
 
 // Definicja wyglądu systemowej strzałki
 const char arrow_cursor[CURSOR_H][CURSOR_W] = {
@@ -27,3 +28,9 @@ const char arrow_cursor[CURSOR_H][CURSOR_W] = {
 };
 
 uint32_t mouse_backdrop[CURSOR_W * CURSOR_H];
+
+void handle_mouse() {
+    restore_mouse_backdrop();
+    save_mouse_backdrop();
+    draw_mouse_cursor();
+}

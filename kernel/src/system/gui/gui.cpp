@@ -10,13 +10,4 @@ void update_gui_state(int mouse_x, int mouse_y) {
     } else {
         start_hover = false;
     }
-    
-    // Możesz też skrócić to do:
-    // start_hover = is_mouse_over_start(mouse_x, mouse_y);
-
-    if (start_hover != last_start_hover) {
-        update_bottom_bar(); // rysuje ponownie ikonę
-        render_frame();
-        last_start_hover = start_hover;
-    }
 }

@@ -1,55 +1,56 @@
-#include "ztrfs.h"
+#include "clawfs.h"
 #include "system/drivers/video/driver.h"
 #include "libs/libc/libc.h"
 #include "system/drivers/ata/driver.h"
 #include "applications/shell/commands.h"
 
-void ztrfs_format()
+void clawfs_format()
 {
     // 1. Formatowanie nagłówka (Sektor 100)
     uint8_t sector_buffer[512] = {0};
-    ZTRFSHeader* header = (ZTRFSHeader*)sector_buffer;
+    CLAWFSHeader* header = (CLAWFSHeader*)sector_buffer;
 
-    header->signature[0] = 'Z';
-    header->signature[1] = 'T';
-    header->signature[2] = 'R';
-    header->signature[3] = 'F';
-    header->signature[4] = 'S';
-    header->version = ZTRFS_VERSION;
+    header->signature[0] = 'C';
+    header->signature[1] = 'L';
+    header->signature[2] = 'A';
+    header->signature[3] = 'W';
+    header->signature[4] = 'F';
+    header->signature[5] = 'S';
+    header->version = CLAWFS_VERSION;
     header->entryCount = 4; // Zaczynamy od 4 domyślnych folderów
 
-    disk_write_sector(ZTRFS_START_LBA, sector_buffer);
+    disk_write_sector(CLAWFS_START_LBA, sector_buffer);
 
     // 2. Formatowanie pierwszych wpisów (Sektor 101)
     uint8_t entries_buffer[512] = {0};
-    ZTRFSEntry* entries = (ZTRFSEntry*)entries_buffer;
+    CLAWFSEntry* entries = (CLAWFSEntry*)entries_buffer;
 
     strcpy(entries[0].name, "bin");
-    entries[0].type = ZTRFS_DIRECTORY;
+    entries[0].type = CLAWFS_DIRECTORY;
 
     strcpy(entries[1].name, "dev");
-    entries[1].type = ZTRFS_DIRECTORY;
+    entries[1].type = CLAWFS_DIRECTORY;
 
     strcpy(entries[2].name, "etc");
-    entries[2].type = ZTRFS_DIRECTORY;
+    entries[2].type = CLAWFS_DIRECTORY;
 
     strcpy(entries[3].name, "home");
-    entries[3].type = ZTRFS_DIRECTORY;
+    entries[3].type = CLAWFS_DIRECTORY;
 
-    disk_write_sector(ZTRFS_START_LBA + 1, entries_buffer);
+    disk_write_sector(CLAWFS_START_LBA + 1, entries_buffer);
 }
 
-void ztrfs_create_file(const char* name)
+void clawfs_create_file(const char* name)
 {
     // 1. Odczytaj nagłówek, aby wiedzieć, ile mamy już wpisów
     uint8_t header_buffer[512];
-    disk_read_sector(ZTRFS_START_LBA, header_buffer);
-    ZTRFSHeader* header = (ZTRFSHeader*)header_buffer;
+    disk_read_sector(CLAWFS_START_LBA, header_buffer);
+    CLAWFSHeader* header = (CLAWFSHeader*)header_buffer;
 
     // 2. SPRAWDZENIE DUPLIKATÓW: Przeszukaj istniejące wpisy na dysku
     uint8_t search_buffer[512];
     uint32_t current_loaded_sector = 0;
-    ZTRFSEntry* search_entries = nullptr;
+    CLAWFSEntry* search_entries = nullptr;
 
     for (uint32_t i = 0; i < header->entryCount; i++)
     {
@@ -58,9 +59,9 @@ void ztrfs_create_file(const char* name)
 
         // Wczytujemy sektor tylko jeśli jeszcze nie mamy go w pamięci RAM
         if (current_loaded_sector != required_sector_offset) {
-            disk_read_sector(ZTRFS_START_LBA + required_sector_offset, search_buffer);
+            disk_read_sector(CLAWFS_START_LBA + required_sector_offset, search_buffer);
             current_loaded_sector = required_sector_offset;
-            search_entries = (ZTRFSEntry*)search_buffer;
+            search_entries = (CLAWFSEntry*)search_buffer;
         }
 
         // strcmp zwraca 0, jeśli nazwy są dokładnie takie same
@@ -85,34 +86,34 @@ void ztrfs_create_file(const char* name)
 
     // Odczytaj docelowy sektor przed modyfikacją
     uint8_t entries_buffer[512];
-    disk_read_sector(ZTRFS_START_LBA + sector_offset, entries_buffer);
-    ZTRFSEntry* entries = (ZTRFSEntry*)entries_buffer;
+    disk_read_sector(CLAWFS_START_LBA + sector_offset, entries_buffer);
+    CLAWFSEntry* entries = (CLAWFSEntry*)entries_buffer;
 
     // Uzupełnij dane nowego wpisu
     strcpy(entries[index_in_sector].name, name);
-    entries[index_in_sector].type = ZTRFS_FILE;
+    entries[index_in_sector].type = CLAWFS_FILE;
 
     // Zapisz zaktualizowany sektor z wpisami z powrotem na dysk
-    disk_write_sector(ZTRFS_START_LBA + sector_offset, entries_buffer);
+    disk_write_sector(CLAWFS_START_LBA + sector_offset, entries_buffer);
 
     // Zwiększ licznik plików w nagłówku i zapisz go
     header->entryCount++;
-    disk_write_sector(ZTRFS_START_LBA, header_buffer);
+    disk_write_sector(CLAWFS_START_LBA, header_buffer);
 
     print_info("File created: ");
     print(name);
     print("\n");
 }
 
-void ztrfs_dir()
+void clawfs_dir()
 {
     uint8_t header_buffer[512];
-    disk_read_sector(ZTRFS_START_LBA, header_buffer);
-    ZTRFSHeader* header = (ZTRFSHeader*)header_buffer;
+    disk_read_sector(CLAWFS_START_LBA, header_buffer);
+    CLAWFSHeader* header = (CLAWFSHeader*)header_buffer;
 
     uint8_t entries_buffer[512];
     uint32_t current_loaded_sector = 0;
-    ZTRFSEntry* entries = nullptr;
+    CLAWFSEntry* entries = nullptr;
 
     for(uint32_t i = 0; i < header->entryCount; i++)
     {
@@ -122,12 +123,12 @@ void ztrfs_dir()
 
         // Czytamy nowy sektor z dysku tylko wtedy, gdy jeszcze go nie mamy w pamięci RAM
         if (current_loaded_sector != required_sector_offset) {
-            disk_read_sector(ZTRFS_START_LBA + required_sector_offset, entries_buffer);
+            disk_read_sector(CLAWFS_START_LBA + required_sector_offset, entries_buffer);
             current_loaded_sector = required_sector_offset;
-            entries = (ZTRFSEntry*)entries_buffer;
+            entries = (CLAWFSEntry*)entries_buffer;
         }
 
-        if(entries[index_in_sector].type == ZTRFS_DIRECTORY)
+        if(entries[index_in_sector].type == CLAWFS_DIRECTORY)
             print("<DIR> ");
         else
             print("      ");
@@ -137,19 +138,20 @@ void ztrfs_dir()
     }
 }
 
-bool ztrfs_exists()
+bool clawfs_exists()
 {
     uint8_t buffer[512];
-    disk_read_sector(ZTRFS_START_LBA, buffer);
-    ZTRFSHeader* header = (ZTRFSHeader*)buffer;
+    disk_read_sector(CLAWFS_START_LBA, buffer);
+    CLAWFSHeader* header = (CLAWFSHeader*)buffer;
 
     bool isValid = (
-        header->signature[0] == 'Z' &&
-        header->signature[1] == 'T' &&
-        header->signature[2] == 'R' &&
-        header->signature[3] == 'F' &&
-        header->signature[4] == 'S' &&
-        header->version == ZTRFS_VERSION
+        header->signature[0] == 'C' &&
+        header->signature[1] == 'L' &&
+        header->signature[2] == 'A' &&
+        header->signature[3] == 'W' &&
+        header->signature[4] == 'F' &&
+        header->signature[5] == 'S' &&
+        header->version == CLAWFS_VERSION
     );
 
     if (isValid) {
