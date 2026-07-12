@@ -141,11 +141,23 @@ void execute_command(const char *cmd) {
             print("    --put \"text\"                     - (Required 1 of 5) Add custom log message with INFO level\n");
             print(" -bootapp                            - Application manager command\n");
             print("    --app \"app_name\"                 - (Required) Load and execute selected application\n");
+
         }
 
         else if (page == 4) {
             print_info("Available commands (Page 4/10):\n");
-            print("More commands coming soon...\n");
+            print(" -beep                               - System PC Speaker sound generator utility\n");
+            print("    --freq \"Hz\"                      - (Optional) Sound frequency in Hertz (Default: 1000 Hz)\n");
+            print("    --dur \"ms\"                       - (Optional) Sound duration in milliseconds (Default: 200 ms)\n");
+            /*
+            -calc – Prosty kalkulator systemowy.
+                --op "add|sub|mul|div" – (Wymagane) Wybór operacji matematycznej.
+                --num1 [wartość] – (Wymagane) Pierwsza liczba.
+                --num2 [wartość] – (Wymagane) Druga liczba.
+            -rand – Generator liczb losowych.
+                --min [wartość] – (Opcjonalne) Dolna granica (domyślnie 0).
+                --max [wartość] – (Opcjonalne) Górna granica.
+            */
         }
 
         else if (page == 5) {
@@ -718,6 +730,84 @@ void execute_command(const char *cmd) {
         else {
             print_error("Syntax error!\n");
             print_info("Usage: bootapp --app \"app_name\"\n");
+        }
+    }
+    // 21. komenda: beep
+        // 21. komenda: beep
+    else if (cmd_name_len == 4 && shell_strncmp(cmd, "beep", 4)) {
+        int freq = 1000; // Domyślna częstotliwość w Hz
+        int dur = 200;   // Domyślny czas trwania w ms
+        
+        const char* freq_flag = shell_strstr(args, "--freq ");
+        const char* dur_flag = shell_strstr(args, "--dur ");
+        
+        // 1. Parsowanie częstotliwości (--freq)
+        if (freq_flag) {
+            const char* freq_arg = freq_flag + 7;
+            char freq_buf[16];
+            int i = 0;
+            
+            if (freq_arg[0] == '"') {
+                freq_arg++;
+                while (freq_arg[i] != '"' && freq_arg[i] != '\0' && i < 15) {
+                    freq_buf[i] = freq_arg[i];
+                    i++;
+                }
+            } else {
+                while (freq_arg[i] != ' ' && freq_arg[i] != '\0' && i < 15) {
+                    freq_buf[i] = freq_arg[i];
+                    i++;
+                }
+            }
+            freq_buf[i] = '\0';
+            
+            if (shell_strlen(freq_buf) > 0) {
+                freq = atoi(freq_buf); // Użyj swojej funkcji konwersji (np. shell_atoi lub atoi)
+            }
+        }
+        
+        // 2. Parsowanie czasu trwania (--dur)
+        if (dur_flag) {
+            const char* dur_arg = dur_flag + 6;
+            char dur_buf[16];
+            int i = 0;
+            
+            if (dur_arg[0] == '"') {
+                dur_arg++;
+                while (dur_arg[i] != '"' && dur_arg[i] != '\0' && i < 15) {
+                    dur_buf[i] = dur_arg[i];
+                    i++;
+                }
+            } else {
+                while (dur_arg[i] != ' ' && dur_arg[i] != '\0' && i < 15) {
+                    dur_buf[i] = dur_arg[i];
+                    i++;
+                }
+            }
+            dur_buf[i] = '\0';
+            
+            if (shell_strlen(dur_buf) > 0) {
+                dur = atoi(dur_buf); // Użyj swojej funkcji konwersji (np. shell_atoi lub atoi)
+            }
+        }
+        
+        // 3. Walidacja i wywołanie funkcji buzzera
+        if (freq > 0 && dur > 0) {
+            // Wywołaj swoją systemową funkcję generującą dźwięk
+            // Na przykład: buzzer_beep(freq, dur); lub play_sound(freq, dur);
+            print_info("Beeping... Freq: "); 
+            print_num8(freq);
+            print(" Hz, Duration: ");
+            print_num8(dur);
+            print(" ms\n");
+
+            beep(freq, dur);
+        } 
+        else {
+            print_error("Invalid arguments!\n");
+            print_info("Usage:\n");
+            print("  beep\n");
+            print("  beep --freq \"frequency\" --dur \"time\"\n");
         }
     }
 

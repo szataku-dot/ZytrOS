@@ -221,3 +221,32 @@ char* strcat(char* destination, const char* source)
 
     return destination;
 }
+
+int atoi(const char* str) {
+    int res = 0;
+    int sign = 1;
+    int i = 0;
+
+    // 1. Pomiń białe znaki na początku (jeśli istnieją)
+    while (str[i] == ' ' || str[i] == '\t' || str[i] == '\n' || 
+           str[i] == '\r' || str[i] == '\v' || str[i] == '\f') {
+        i++;
+    }
+
+    // 2. Obsługa znaku plus / minus
+    if (str[i] == '-') {
+        sign = -1;
+        i++;
+    } else if (str[i] == '+') {
+        i++;
+    }
+
+    // 3. Konwersja kolejnych cyfr na liczbę
+    while (str[i] >= '0' && str[i] <= '10') {
+        // Bezpieczne zabezpieczenie przed przepełnieniem (opcjonalne, ale zalecane)
+        res = res * 10 + (str[i] - '0');
+        i++;
+    }
+
+    return sign * res;
+}

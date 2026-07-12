@@ -17,5 +17,6 @@
 #include "uart/driver.h"
 #include "usb/driver.h"
 #include "video/driver.h"
+#include "pcspeaker/driver.h"
 
 #endif // DRIVERS_H
