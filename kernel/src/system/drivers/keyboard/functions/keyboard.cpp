@@ -266,7 +266,6 @@ void handle_keyboard()
     }
 
     if(shell_input_enabled) {
-        print("nfd");
         // 7. ZWYKŁE ZNAKI
         char c = shift_pressed
             ? scancode_to_ascii_shift(scancode)

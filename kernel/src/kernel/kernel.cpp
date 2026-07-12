@@ -103,8 +103,6 @@ extern "C" void kmain() {
     clear_screen();
     update_bottom_bar();
 
-    save_mouse_backdrop();
-    draw_mouse_cursor();
     render_frame();
 
     fetch();

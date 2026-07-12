@@ -17,6 +17,8 @@ extern bool start_hover;
 void draw_start_button(size_t x, size_t y);
 bool is_mouse_over_start(int mouse_x, int mouse_y);
 
+void draw_start_menu_system_icons(int x, int y);
+
 template <size_t rows, size_t cols>
 void draw_icon(const char (&icon)[rows][cols], size_t start_x, size_t start_y) {
     if (!fb) return;

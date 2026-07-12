@@ -24,7 +24,8 @@ inline constexpr uint32_t COLOR_LIGHT_GRAY          = 0xFFCCCCCC;
 // ===== NasuaOS UI CORE =====
 inline constexpr uint32_t COLOR_NASUA_BG            = 0xFF121826;  // ciemny granat
 inline constexpr uint32_t COLOR_NASUA_TASKBAR       = 0xFF1F2937;  // grafit
-inline constexpr uint32_t COLOR_NASUA_START_MENU    = 0xFF243142;  // grafit
+inline constexpr uint32_t COLOR_NASUA_START_MENU    = 0xFF243142;
+inline constexpr uint32_t COLOR_NASUA_START_MENU_P  = 0xFF151E29;
 inline constexpr uint32_t COLOR_NASUA_DARK          = 0xFF808080; // cienie 3D
 inline constexpr uint32_t COLOR_NASUA_DARKER        = 0xFF404040;
 inline constexpr uint32_t COLOR_NASUA_LIGHT         = 0xFFE0E0E0; // highlight
