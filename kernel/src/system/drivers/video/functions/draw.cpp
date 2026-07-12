@@ -95,12 +95,16 @@ void update_bottom_bar() {
 
     size_t bar_h = 36;
     size_t start_y = fb->height - bar_h;
+    size_t start_x = fb->width;
 
     for (size_t y = start_y; y < fb->height; y++) {
         for (size_t x = 0; x < fb->width; x++) {
             bb_ptr[y * pitch + x] = COLOR_DARK_GRAY;
         }
     }
+
+    draw_icon(speaker_icon, start_x - 150, start_y + 10);
+    draw_icon(notification_icon, start_x - 130, start_y + 10);
 
     draw_start_button(5, start_y + 2);
 }
