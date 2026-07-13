@@ -155,7 +155,7 @@ void execute_command(const char *cmd) {
             print("    --op \"add|sub|mul|div\"           - (Required) Selection of mathematical operation\n");
             print("    --num1 \"value\"                   - (Required) First numeric value\n");
             print("    --num2 \"value\"                   - (Required) Second numeric value\n");
-            print(" -rand                               - Pseudo-random number generator\n");
+            print(" -rand                               - Random number generator\n");
             print("    --min \"value\"                   - (Optional) Lower bound of the range (Default: 0)\n");
             print("    --max \"value\"                   - (Required) Upper bound of the range\n");
         }
@@ -964,8 +964,8 @@ void execute_command(const char *cmd) {
                 print("\n");
             }
         } else {
-            print_error("Syntax error! Argument --max is required.\n");
-            print_info("Usage: rand [--min val] --max [val]\n");
+            print_error("Syntax error!\n");
+            print_info("Usage: rand --min [val] --max [val]\n");
         }
     }
 
