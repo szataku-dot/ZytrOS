@@ -39,7 +39,7 @@ jobs:
         run: |
           make all-hdd
 
-      - name: Find generated images
+      - name: Find images
         run: |
           echo "Generated files:"
           find . \( -name "*.iso" -o -name "*.hdd" \) -type f
@@ -48,20 +48,35 @@ jobs:
         run: |
           mkdir release
 
-          cp $(find . -name "*.iso" | head -n 1) release/
-          cp $(find . -name "*.hdd" | head -n 1) release/
+          cp $(find . -name "*.iso" | head -n 1) release/NasuaOS.iso
+          cp $(find . -name "*.hdd" | head -n 1) release/NasuaOS.hdd
 
           cd release
 
-          cat > README.md << 'EOF'
-# NasuaOS Builds 
+          printf "# NasuaOS Builds\n\n" > README.md
+          printf "## ISO\n" >> README.md
+          printf "Boot from CD/USB:\n" >> README.md
+          printf "  NasuaOS.iso\n\n" >> README.md
 
-## ISO 
-Boot from CD/USB: 
-  NasuaOS.iso 
+          printf "## HDD\n" >> README.md
+          printf "For QEMU:\n" >> README.md
+          printf "  NasuaOS.hdd\n\n" >> README.md
 
-## HDD For QEMU: 
-  NasuaOS.hdd 
-  
-  Example: 
-    qemu-system-x86_64 -hda NasuaOS.hdd
+          printf "Example:\n" >> README.md
+          printf "    qemu-system-x86_64 -hda NasuaOS.hdd\n" >> README.md
+
+      - name: Push builds to iso branch
+        run: |
+          cd release
+
+          git init
+          git checkout -b iso
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add .
+          git commit -m "Update NasuaOS builds"
+
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git push --force origin iso
