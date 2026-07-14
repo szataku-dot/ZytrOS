@@ -36,6 +36,7 @@ NasuaOS is an experimental operating system focused on learning, low-level progr
 [📚 Documentation](documentation/main_page.md)  
 [🔨 Build Instructions](documentation/build_instructions.md)  
 [🤝 Contributing](CONTRIBUTING.md)
+[📦 Download ISO/HDD builds](https://github.com/szatakis/NasuaOS/tree/iso)
 
 ---
 
@@ -81,6 +82,24 @@ Additional technical information, architecture notes and driver documentation wi
 Currently NasuaOS can be built on Linux using GCC and CMake.
 
 [🔨 Build Instructions](documentation/build_instructions.md)  
+
+## Prebuilt Images
+
+Prebuilt NasuaOS images are available in the `iso` branch.
+
+The branch contains automatically generated builds:
+
+- `NasuaOS.iso` - bootable ISO image for QEMU, VirtualBox and real hardware
+- `NasuaOS.hdd` - HDD disk image for virtual machines
+
+You can download the latest images from:
+
+[📦 Download ISO/HDD builds](https://github.com/szatakis/NasuaOS/tree/iso)
+
+Example QEMU usage:
+
+```bash
+qemu-system-x86_64 -hda NasuaOS.hdd
 
 # Contributing
 

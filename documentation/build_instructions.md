@@ -57,6 +57,7 @@ sudo apt install \
     clang \
     lld \
     nasm \
+    mtools \
     qemu-system-x86
 ```
 
