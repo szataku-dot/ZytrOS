@@ -1,0 +1,39 @@
+name: Build NasuaOS
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            gcc \
+            g++ \
+            cmake \
+            xorriso \
+            clang \
+            lld \
+            nasm \
+            qemu-system-x86
+
+      - name: Build ISO
+        run: |
+          make all
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nasuaos-iso
+          path: |
+            *.iso
