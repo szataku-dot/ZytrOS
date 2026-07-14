@@ -35,7 +35,7 @@ NasuaOS is an experimental operating system focused on learning, low-level progr
 
 [📚 Documentation](documentation/main_page.md)  
 [🔨 Build Instructions](documentation/build_instructions.md)  
-[🤝 Contributing](CONTRIBUTING.md)
+[🤝 Contributing](CONTRIBUTING.md)  
 [📦 Download ISO/HDD builds](https://github.com/szatakis/NasuaOS/tree/iso)
 
 ---
