@@ -9,7 +9,7 @@
 #include "system/gui/icons/icons.h"
 #include "libs/libc/libc.h"
 #include "libs/asm/asm.h"
-#include "system/sysfunc/history.h"
+#include "system/sysfunc/command_history/history.h"
 #include "system/gui/gui.h"
 
 char command_buffer[64];

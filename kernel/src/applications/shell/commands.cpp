@@ -18,7 +18,7 @@
 
 #include "system/filesystem/clawfs.h"
 
-#include "system/sysfunc/rand.h"
+#include "system/sysfunc/rand/rand.h"
 
 #include "libs/asm/asm.h"
 
