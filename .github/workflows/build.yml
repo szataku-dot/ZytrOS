@@ -55,8 +55,8 @@ jobs:
 
           cd release
 
-          printf "![Logo](https://raw.githubusercontent.com/szatakis/NasuaOS/main/documentation/images/logo.png)" >> README.md
-          printf "# NasuaOS Builds\n\n" > README.md
+          printf "![Logo](https://raw.githubusercontent.com/szatakis/NasuaOS/main/documentation/images/logo.png)" > README.md
+          printf "# NasuaOS Builds\n\n" >> README.md
           printf "Prebuilt images are available for testing in QEMU, VirtualBox, or on real hardware.\n\n" >> README.md
 
           printf "## Available Images\n\n" >> README.md
