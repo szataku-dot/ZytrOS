@@ -78,7 +78,7 @@ extern "C" void kmain() {
     fb = framebuffer_request.response->framebuffers[0];
     // Initialize backbuffer with framebuffer dimensions
     init_backbuffer(fb->width, fb->height, fb->pitch);
-    init_terminal_buffer();
+    init_text_buffer();
 
     Uart::init();
 
@@ -100,22 +100,12 @@ extern "C" void kmain() {
 
     asm volatile("sti");
 
-    fetch();
-    print(CMD_TEXT_WHITE);
-    print("Enter Command\n");
-    print_cmd();
-
     // Główna pętla wywołań
     for (;;) {
-        update_windows_positions(mouse_x, mouse_y);
-
         clear_screen();
-        update_gui_state(mouse_x, mouse_y);
 
-        draw_terminal_buffer();
         update_gui();
-        draw_windows(); 
-        draw_start_menu();
+        update_windows_gui();
 
         handle_keyboard();
         handle_mouse();

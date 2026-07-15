@@ -194,15 +194,7 @@ void execute_command(const char *cmd) {
     // 2. Komenda: clear
     else if (cmd_name_len == 5 && shell_strncmp(cmd, "clear", 5)) {
         // 1. Resetowanie wirtualnego bufora tekstu (czyszczenie pamięci konsoli)
-        init_terminal_buffer();
-
-        fetch();
-
-        print(CMD_TEXT_WHITE);
-        print("Enter Command\n");
-
-        print_cmd();
-
+        init_text_buffer();
         return; 
     } 
     // 3. Komenda: echo

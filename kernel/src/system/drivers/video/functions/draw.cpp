@@ -7,8 +7,10 @@
 
 #include "system/gui/icons/icons.h"
 #include "system/drivers/rtc/driver.h"
+#include "system/drivers/mouse/driver.h"
 
 #include "system/gui/vars/colors.h"
+#include "system/gui/gui.h"
 
 #include "system/sysfunc/notification_manager/notification_manager.h"
 
@@ -149,8 +151,31 @@ void update_time() {
     print_at8(date_buf, text_x, start_y + 20, COLOR_WHITE);
 }
 
-// ---------------- BOTTOM BAR ----------------
-// Rysuje cały dolny pasek zadań na gotowo do backbuffera co klatkę
+void draw_rect(int x1, int y1, int x2, int y2, uint32_t color) {
+    if (!fb) return;
+
+    // 1. Zabezpieczenie współrzędnych
+    if (x1 > x2) { int tmp = x1; x1 = x2; x2 = tmp; }
+    if (y1 > y2) { int tmp = y1; y1 = y2; y2 = tmp; }
+
+    // 2. Clipping (ochrona przed wyjściem poza ekran)
+    if (x1 < 0) x1 = 0;
+    if (y1 < 0) y1 = 0;
+    if (x2 >= static_cast<int>(fb->width))  x2 = static_cast<int>(fb->width) - 1;
+    if (y2 >= static_cast<int>(fb->height)) y2 = static_cast<int>(fb->height) - 1;
+
+    // 3. Pobranie wskaźnika na backbuffer
+    uint32_t* bb_ptr = get_backbuffer();
+    int pixels_per_pitch = get_backbuffer_pitch();
+
+    // 4. Rysowanie prostokąta
+    for (int y = y1; y < y2; ++y) {
+        for (int x = x1; x < x2; ++x) {
+            bb_ptr[y * pixels_per_pitch + x] = color;
+        }
+    }
+}
+
 void update_bottom_bar() {
     if (!fb) return;
 
@@ -176,32 +201,10 @@ void update_bottom_bar() {
     update_time();
 }
 
-// Zostawiamy funkcję zbiorczą wywoływaną co klatkę w głównej pętli
 void update_gui() {
+    update_gui_state(mouse_x, mouse_y);
+
     update_bottom_bar();
-}
-
-void draw_rect(int x1, int y1, int x2, int y2, uint32_t color) {
-    if (!fb) return;
-
-    // 1. Zabezpieczenie współrzędnych
-    if (x1 > x2) { int tmp = x1; x1 = x2; x2 = tmp; }
-    if (y1 > y2) { int tmp = y1; y1 = y2; y2 = tmp; }
-
-    // 2. Clipping (ochrona przed wyjściem poza ekran)
-    if (x1 < 0) x1 = 0;
-    if (y1 < 0) y1 = 0;
-    if (x2 >= static_cast<int>(fb->width))  x2 = static_cast<int>(fb->width) - 1;
-    if (y2 >= static_cast<int>(fb->height)) y2 = static_cast<int>(fb->height) - 1;
-
-    // 3. Pobranie wskaźnika na backbuffer
-    uint32_t* bb_ptr = get_backbuffer();
-    int pixels_per_pitch = get_backbuffer_pitch();
-
-    // 4. Rysowanie prostokąta
-    for (int y = y1; y < y2; ++y) {
-        for (int x = x1; x < x2; ++x) {
-            bb_ptr[y * pixels_per_pitch + x] = color;
-        }
-    }
+    draw_text_buffer();
+    draw_start_menu();
 }

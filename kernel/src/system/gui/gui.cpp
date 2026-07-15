@@ -21,15 +21,6 @@ extern void draw_rect(int x1, int y1, int x2, int y2, uint32_t color);
 extern bool is_mouse_over_start(int mouse_x, int mouse_y);
 extern void draw_start_menu_system_icons(int x, int y);
 
-void update_gui_state(int mouse_x, int mouse_y) {
-    // Sprawdzamy czy mysz jest nad przyciskiem i aktualizujemy flagę
-    if (is_mouse_over_start(mouse_x, mouse_y)) {
-        start_hover = true;
-    } else {
-        start_hover = false;
-    }
-}
-
 // Funkcja rysująca menu (przyjmuje bezwzględne współrzędne ekranu jako X i Y oraz Szerokość i Wysokość)
 void draw_start_menu_f(int x, int y, int w, int h) {
     int panel_width = 45;
@@ -64,4 +55,18 @@ void open_start_menu() {
 
 void close_start_menu() {
     is_menu_start_open = false;
+}
+
+void update_gui_state(int mouse_x, int mouse_y) {
+    // Sprawdzamy czy mysz jest nad przyciskiem i aktualizujemy flagę
+    if (is_mouse_over_start(mouse_x, mouse_y)) {
+        start_hover = true;
+    } else {
+        start_hover = false;
+    }
+}
+
+void update_windows_gui() {
+    update_windows_positions(mouse_x, mouse_y);
+    draw_windows(); 
 }

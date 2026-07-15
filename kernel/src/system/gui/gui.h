@@ -9,4 +9,6 @@ void close_start_menu();
 
 void draw_start_menu();
 
+void update_windows_gui();
+
 #endif // GUI_H

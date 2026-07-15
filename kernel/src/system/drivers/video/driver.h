@@ -19,8 +19,8 @@ uint32_t* get_backbuffer();
 size_t get_backbuffer_pitch();
 void render_frame();  // Copy entire backbuffer to framebuffer
 
-void init_terminal_buffer();
-void draw_terminal_buffer();
+void init_text_buffer();
+void draw_text_buffer();
 
 void clear_screen();
 void clear_line();
