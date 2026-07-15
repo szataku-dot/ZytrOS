@@ -1,5 +1,5 @@
 #include "history.h"
-#include "libs/libc/libc.h" // dla strcpy, strcmp, strlen
+#include "libs/libc/libc.h"
 
 constexpr size_t HISTORY_SIZE = 10;
 constexpr size_t COMMAND_SIZE = 64;

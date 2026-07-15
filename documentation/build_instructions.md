@@ -93,16 +93,6 @@ Install WSL with either:
 
 Inside your Linux distribution, follow the **Ubuntu / Debian** instructions above.
 
-### 3. (Optional) Install QEMU on Windows
-
-If you want to run NasuaOS directly from `make run`, install QEMU for Windows and ensure it is available in your system's `PATH`.
-
-Otherwise, you can simply build the ISO:
-
-```bash
-make all
-```
-
 ---
 
 # Build Targets

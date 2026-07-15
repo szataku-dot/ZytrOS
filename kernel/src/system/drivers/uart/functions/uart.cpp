@@ -21,6 +21,10 @@ void Uart::puts(const char* str)
 {
     while (*str) 
     {
+        if (*str == '\n') 
+        {
+            putc('\r');
+        }
         putc(*str++);
     }
 }

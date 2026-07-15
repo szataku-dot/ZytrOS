@@ -11,7 +11,13 @@ override IMAGE_NAME := NasuaOS-$(ARCH)
 override FS_NAME := clawfs_disk
 
 # Wykrywanie WSL
-IS_WSL := $(shell grep -qi microsoft /proc/version 2>/dev/null && echo 1 || echo 0)
+DEBUG_WSL ?= true
+
+ifeq ($(DEBUG_WSL),true)
+	IS_WSL := 1
+else
+	IS_WSL := $(shell grep -qi microsoft /proc/version 2>/dev/null && echo 1 || echo 0)
+endif
 
 ifeq ($(IS_WSL),1)
 QEMU_X86_64 = /mnt/c/Program\ Files/qemu/qemu-system-x86_64.exe
