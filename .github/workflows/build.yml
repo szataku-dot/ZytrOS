@@ -56,16 +56,25 @@ jobs:
           cd release
 
           printf "# NasuaOS Builds\n\n" > README.md
-          printf "## ISO\n" >> README.md
-          printf "Boot from CD/USB:\n" >> README.md
-          printf "  NasuaOS.iso\n\n" >> README.md
+          printf "Prebuilt images are available for testing in QEMU, VirtualBox, or on real hardware.\n\n" >> README.md
 
-          printf "## HDD\n" >> README.md
-          printf "For QEMU:\n" >> README.md
-          printf "  NasuaOS.hdd\n\n" >> README.md
+          printf "## Available Images\n\n" >> README.md
+          printf "| Image | Description |\n" >> README.md
+          printf "|-------|-------------|\n" >> README.md
+          printf "| **NasuaOS.iso** | Bootable ISO image for CD/DVD or USB media. Compatible with QEMU, VirtualBox, and real hardware. |\n" >> README.md
+          printf "| **NasuaOS.hdd** | Virtual hard disk image intended primarily for QEMU and other virtual machines. |\n\n" >> README.md
 
-          printf "Example:\n" >> README.md
-          printf "    qemu-system-x86_64 -hda NasuaOS.hdd\n" >> README.md
+          printf "## Running in QEMU\n\n" >> README.md
+          printf "\`\`\`bash\n" >> README.md
+          printf "qemu-system-x86_64 -hda NasuaOS.hdd\n" >> README.md
+          printf "\`\`\`\n\n" >> README.md
+
+          printf "## Booting the ISO\n\n" >> README.md
+          printf "\`\`\`bash\n" >> README.md
+          printf "qemu-system-x86_64 -cdrom NasuaOS.iso -boot d\n" >> README.md
+          printf "\`\`\`\n\n" >> README.md
+
+          printf "You can also write the ISO image to a USB flash drive and boot it on supported hardware.\n" >> README.md
 
       - name: Push builds to iso branch
         run: |

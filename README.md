@@ -96,11 +96,6 @@ You can download the latest images from:
 
 [📦 Download ISO/HDD builds](https://github.com/szatakis/NasuaOS/tree/iso)
 
-Example QEMU usage:
-
-```bash
-qemu-system-x86_64 -hda NasuaOS.hdd
-
 # Contributing
 
 Contributions, bug reports and feature suggestions are welcome.
