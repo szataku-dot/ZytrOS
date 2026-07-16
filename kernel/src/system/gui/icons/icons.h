@@ -9,8 +9,8 @@ extern const uint32_t notification_icon[1024];
 extern const uint32_t notification_icon_h[1024];
 extern const uint32_t speaker_icon[1024];
 
-extern int term_x;
-extern int term_y;
+extern int icons_start_x;
+extern int icons_start_y;
 
 extern bool is_menu_start_open;
 extern bool start_hover;

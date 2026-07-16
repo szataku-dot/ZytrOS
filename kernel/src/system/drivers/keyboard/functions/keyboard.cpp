@@ -301,9 +301,14 @@ void handle_keyboard()
         }
         else if(!is_mouse_over_any_window(mouse_x, mouse_y)) 
         {
-            if (is_mouse_over_icon(mouse_x, mouse_y, term_x, term_y, 32, 32) && is_menu_start_open)
+            if (is_mouse_over_icon(mouse_x, mouse_y, icons_start_x, icons_start_y, 255, 32) && is_menu_start_open)
             {
                 execute_command("bootapp --app \"terminal\"");
+                return;
+            }
+            else if (is_mouse_over_icon(mouse_x, mouse_y, icons_start_x, icons_start_y + 45, 255, 32) && is_menu_start_open)
+            {
+                execute_command("bootapp --app \"calculator\"");
                 return;
             }
             else if(shell_input_enabled) 
