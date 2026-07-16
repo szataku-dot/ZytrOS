@@ -15,7 +15,7 @@ Install the following tools before building:
 - Clang
 - LLD
 - NASM
-- QEMU *(optional, recommended for testing)*
+- QEMU *(optional, recommended for testing (best 10.2.50))*
 
 ## Clone the Repository
 
