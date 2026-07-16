@@ -1,5 +1,20 @@
 #include "terminal.h"
+
 #include "../shell/commands.h"
+
+bool is_empty_or_whitespace(const char* str) {
+    if (str == nullptr || *str == '\0') {
+        return true; 
+    }
+    while (*str) {
+        // Ręczne sprawdzenie białych znaków: spacja, tabulacja, nowa linia, powrót karetki
+        if (*str != ' ' && *str != '\t' && *str != '\n' && *str != '\r') {
+            return false; // Znaleziono rzeczywisty znak komendy
+        }
+        str++;
+    }
+    return true; 
+}
 
 struct terminal_state 
 {
@@ -18,7 +33,9 @@ void terminal_key(window_struct* win, char key)
 
     if (key == '\n') 
     {
-        execute_command(term->input);
+        if(!is_empty_or_whitespace(term->input)) {
+            execute_command(term->input);
+        }
 
         term->cursor = 0;
         term->input[0] = '\0';
