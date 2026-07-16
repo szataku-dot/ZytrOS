@@ -38,8 +38,8 @@ define PREPARE_WSL
 	fi
 
 	@cp $(IMAGE_NAME).iso /mnt/c/wsl_target/$(IMAGE_NAME).iso
-	@rm -rf /mnt/c/wsl_target/edk2-ovmf-bins
-	@cp -r edk2-ovmf-bins /mnt/c/wsl_target/
+	@rm -rf /mnt/c/wsl_target/edk2-bins
+	@cp -r edk2-bins /mnt/c/wsl_target/
 endef
 
 else
@@ -74,12 +74,12 @@ run: run-$(ARCH)
 run-hdd: run-hdd-$(ARCH)
 
 .PHONY: run-x86_64
-run-x86_64: edk2-ovmf-bins $(IMAGE_NAME).iso
+run-x86_64: edk2-bins $(IMAGE_NAME).iso
 ifeq ($(IS_WSL),1)
 	$(PREPARE_WSL)
 	$(QEMU_X86_64) \
 		-M pc \
-		-drive if=pflash,unit=0,format=raw,file=C:\\wsl_target\\edk2-ovmf-bins\\ovmf-code-x86_64.fd,readonly=on \
+		-drive if=pflash,unit=0,format=raw,file=C:\\wsl_target\\edk2-bins\\ovmf-code-x86_64.fd,readonly=on \
 		-cdrom C:\\wsl_target\\$(IMAGE_NAME).iso \
 		-drive id=$(FS_NAME),file=C:\\wsl_target\\$(FS_NAME).img,format=raw,if=none \
 		-device ide-hd,drive=$(FS_NAME),bus=ide.0,unit=0 \
@@ -91,7 +91,7 @@ ifeq ($(IS_WSL),1)
 else
 	$(QEMU_X86_64) \
 		-M q35 \
-		-drive if=pflash,unit=0,format=raw,file=edk2-ovmf-bins/ovmf-code-x86_64.fd,readonly=on \
+		-drive if=pflash,unit=0,format=raw,file=edk2-bins/ovmf-code-x86_64.fd,readonly=on \
 		-cdrom $(IMAGE_NAME).iso \
 		-audiodev sdl,id=snd0 \
 		-machine pcspk-audiodev=snd0 \
@@ -99,17 +99,17 @@ else
 endif
 
 .PHONY: run-hdd-x86_64
-run-hdd-x86_64: edk2-ovmf-bins $(IMAGE_NAME).hdd
+run-hdd-x86_64: edk2-bins $(IMAGE_NAME).hdd
 ifeq ($(IS_WSL),1)
 	@powershell.exe -Command "New-Item -ItemType Directory -Force -Path C:\wsl_target" > /dev/null
 
 	@cp $(IMAGE_NAME).hdd /mnt/c/wsl_target/$(IMAGE_NAME).hdd
-	@rm -rf /mnt/c/wsl_target/edk2-ovmf-bins
-	@cp -r edk2-ovmf-bins /mnt/c/wsl_target/
+	@rm -rf /mnt/c/wsl_target/edk2-bins
+	@cp -r edk2-bins /mnt/c/wsl_target/
 
 	$(QEMU_X86_64) \
 		-M q35 \
-		-drive if=pflash,unit=0,format=raw,file=C:\\wsl_target\\edk2-ovmf-bins\\ovmf-code-x86_64.fd,readonly=on \
+		-drive if=pflash,unit=0,format=raw,file=C:\\wsl_target\\edk2-bins\\ovmf-code-x86_64.fd,readonly=on \
 		-hda C:\\wsl_target\\$(IMAGE_NAME).hdd \
 		$(QEMUFLAGS) \
 		-display sdl,gl=on \
@@ -117,13 +117,13 @@ ifeq ($(IS_WSL),1)
 else
 	$(QEMU_X86_64) \
 		-M q35 \
-		-drive if=pflash,unit=0,format=raw,file=edk2-ovmf-bins/ovmf-code-x86_64.fd,readonly=on \
+		-drive if=pflash,unit=0,format=raw,file=edk2-bins/ovmf-code-x86_64.fd,readonly=on \
 		-hda $(IMAGE_NAME).hdd \
 		$(QEMUFLAGS)
 endif
 
 .PHONY: run-aarch64
-run-aarch64: edk2-ovmf-bins $(IMAGE_NAME).iso
+run-aarch64: edk2-bins $(IMAGE_NAME).iso
 ifeq ($(IS_WSL),1)
 	$(PREPARE_WSL)
 	$(QEMU_AARCH64) \
@@ -133,7 +133,7 @@ ifeq ($(IS_WSL),1)
 		-device qemu-xhci \
 		-device usb-kbd \
 		-device usb-tablet \
-		-drive if=pflash,unit=0,format=raw,file=C:\\wsl_target\\edk2-ovmf-bins\\ovmf-code-aarch64.fd,readonly=on \
+		-drive if=pflash,unit=0,format=raw,file=C:\\wsl_target\\edk2-bins\\ovmf-code-aarch64.fd,readonly=on \
 		-cdrom C:\\wsl_target\\$(IMAGE_NAME).iso \
 		$(QEMUFLAGS)
 else
@@ -144,17 +144,17 @@ else
 		-device qemu-xhci \
 		-device usb-kbd \
 		-device usb-tablet \
-		-drive if=pflash,unit=0,format=raw,file=edk2-ovmf-bins/ovmf-code-aarch64.fd,readonly=on \
+		-drive if=pflash,unit=0,format=raw,file=edk2-bins/ovmf-code-aarch64.fd,readonly=on \
 		-cdrom $(IMAGE_NAME).iso \
 		$(QEMUFLAGS)
 endif
 
 .PHONY: run-hdd-aarch64
-run-hdd-aarch64: edk2-ovmf-bins $(IMAGE_NAME).hdd
+run-hdd-aarch64: edk2-bins $(IMAGE_NAME).hdd
 ifeq ($(IS_WSL),1)
 	@cp $(IMAGE_NAME).hdd /mnt/c/wsl_target/$(IMAGE_NAME).hdd
-	@rm -rf /mnt/c/wsl_target/edk2-ovmf-bins
-	@cp -r edk2-ovmf-bins /mnt/c/wsl_target/
+	@rm -rf /mnt/c/wsl_target/edk2-bins
+	@cp -r edk2-bins /mnt/c/wsl_target/
 
 	$(QEMU_AARCH64) \
 		-M virt \
@@ -163,7 +163,7 @@ ifeq ($(IS_WSL),1)
 		-device qemu-xhci \
 		-device usb-kbd \
 		-device usb-tablet \
-		-drive if=pflash,unit=0,format=raw,file=C:\\wsl_target\\edk2-ovmf-bins\\ovmf-code-aarch64.fd,readonly=on \
+		-drive if=pflash,unit=0,format=raw,file=C:\\wsl_target\\edk2-bins\\ovmf-code-aarch64.fd,readonly=on \
 		-hda C:\\wsl_target\\$(IMAGE_NAME).hdd \
 		$(QEMUFLAGS)
 else
@@ -174,13 +174,13 @@ else
 		-device qemu-xhci \
 		-device usb-kbd \
 		-device usb-tablet \
-		-drive if=pflash,unit=0,format=raw,file=edk2-ovmf-bins/ovmf-code-aarch64.fd,readonly=on \
+		-drive if=pflash,unit=0,format=raw,file=edk2-bins/ovmf-code-aarch64.fd,readonly=on \
 		-hda $(IMAGE_NAME).hdd \
 		$(QEMUFLAGS)
 endif
 
 .PHONY: run-riscv64
-run-riscv64: edk2-ovmf-bins $(IMAGE_NAME).iso
+run-riscv64: edk2-bins $(IMAGE_NAME).iso
 ifeq ($(IS_WSL),1)
 	$(PREPARE_WSL)
 	$(QEMU_RISCV64) \
@@ -190,7 +190,7 @@ ifeq ($(IS_WSL),1)
 		-device qemu-xhci \
 		-device usb-kbd \
 		-device usb-tablet \
-		-drive if=pflash,unit=0,format=raw,file=C:\\wsl_target\\edk2-ovmf-bins\\ovmf-code-riscv64.fd,readonly=on \
+		-drive if=pflash,unit=0,format=raw,file=C:\\wsl_target\\edk2-bins\\ovmf-code-riscv64.fd,readonly=on \
 		-cdrom C:\\wsl_target\\$(IMAGE_NAME).iso \
 		$(QEMUFLAGS)
 else
@@ -201,17 +201,17 @@ else
 		-device qemu-xhci \
 		-device usb-kbd \
 		-device usb-tablet \
-		-drive if=pflash,unit=0,format=raw,file=edk2-ovmf-bins/ovmf-code-riscv64.fd,readonly=on \
+		-drive if=pflash,unit=0,format=raw,file=edk2-bins/ovmf-code-riscv64.fd,readonly=on \
 		-cdrom $(IMAGE_NAME).iso \
 		$(QEMUFLAGS)
 endif
 
 .PHONY: run-hdd-riscv64
-run-hdd-riscv64: edk2-ovmf-bins $(IMAGE_NAME).hdd
+run-hdd-riscv64: edk2-bins $(IMAGE_NAME).hdd
 ifeq ($(IS_WSL),1)
 	@cp $(IMAGE_NAME).hdd /mnt/c/wsl_target/$(IMAGE_NAME).hdd
-	@rm -rf /mnt/c/wsl_target/edk2-ovmf-bins
-	@cp -r edk2-ovmf-bins /mnt/c/wsl_target/
+	@rm -rf /mnt/c/wsl_target/edk2-bins
+	@cp -r edk2-bins /mnt/c/wsl_target/
 
 	$(QEMU_RISCV64) \
 		-M virt \
@@ -220,7 +220,7 @@ ifeq ($(IS_WSL),1)
 		-device qemu-xhci \
 		-device usb-kbd \
 		-device usb-tablet \
-		-drive if=pflash,unit=0,format=raw,file=C:\\wsl_target\\edk2-ovmf-bins\\ovmf-code-riscv64.fd,readonly=on \
+		-drive if=pflash,unit=0,format=raw,file=C:\\wsl_target\\edk2-bins\\ovmf-code-riscv64.fd,readonly=on \
 		-hda C:\\wsl_target\\$(IMAGE_NAME).hdd \
 		$(QEMUFLAGS)
 else
@@ -231,13 +231,13 @@ else
 		-device qemu-xhci \
 		-device usb-kbd \
 		-device usb-tablet \
-		-drive if=pflash,unit=0,format=raw,file=edk2-ovmf-bins/ovmf-code-riscv64.fd,readonly=on \
+		-drive if=pflash,unit=0,format=raw,file=edk2-bins/ovmf-code-riscv64.fd,readonly=on \
 		-hda $(IMAGE_NAME).hdd \
 		$(QEMUFLAGS)
 endif
 
 .PHONY: run-loongarch64
-run-loongarch64: edk2-ovmf-bins $(IMAGE_NAME).iso
+run-loongarch64: edk2-bins $(IMAGE_NAME).iso
 ifeq ($(IS_WSL),1)
 	$(PREPARE_WSL)
 	$(QEMU_LOONGARCH64) \
@@ -247,7 +247,7 @@ ifeq ($(IS_WSL),1)
 		-device qemu-xhci \
 		-device usb-kbd \
 		-device usb-tablet \
-		-drive if=pflash,unit=0,format=raw,file=C:\\wsl_target\\edk2-ovmf-bins\\ovmf-code-loongarch64.fd,readonly=on \
+		-drive if=pflash,unit=0,format=raw,file=C:\\wsl_target\\edk2-bins\\ovmf-code-loongarch64.fd,readonly=on \
 		-cdrom C:\\wsl_target\\$(IMAGE_NAME).iso \
 		$(QEMUFLAGS)
 else
@@ -258,17 +258,17 @@ else
 		-device qemu-xhci \
 		-device usb-kbd \
 		-device usb-tablet \
-		-drive if=pflash,unit=0,format=raw,file=edk2-ovmf-bins/ovmf-code-loongarch64.fd,readonly=on \
+		-drive if=pflash,unit=0,format=raw,file=edk2-bins/ovmf-code-loongarch64.fd,readonly=on \
 		-cdrom $(IMAGE_NAME).iso \
 		$(QEMUFLAGS)
 endif
 
 .PHONY: run-hdd-loongarch64
-run-hdd-loongarch64: edk2-ovmf-bins $(IMAGE_NAME).hdd
+run-hdd-loongarch64: edk2-bins $(IMAGE_NAME).hdd
 ifeq ($(IS_WSL),1)
 	@cp $(IMAGE_NAME).hdd /mnt/c/wsl_target/$(IMAGE_NAME).hdd
-	@rm -rf /mnt/c/wsl_target/edk2-ovmf-bins
-	@cp -r edk2-ovmf-bins /mnt/c/wsl_target/
+	@rm -rf /mnt/c/wsl_target/edk2-bins
+	@cp -r edk2-bins /mnt/c/wsl_target/
 
 	$(QEMU_LOONGARCH64) \
 		-M virt \
@@ -277,7 +277,7 @@ ifeq ($(IS_WSL),1)
 		-device qemu-xhci \
 		-device usb-kbd \
 		-device usb-tablet \
-		-drive if=pflash,unit=0,format=raw,file=C:\\wsl_target\\edk2-ovmf-bins\\ovmf-code-loongarch64.fd,readonly=on \
+		-drive if=pflash,unit=0,format=raw,file=C:\\wsl_target\\edk2-bins\\ovmf-code-loongarch64.fd,readonly=on \
 		-hda C:\\wsl_target\\$(IMAGE_NAME).hdd \
 		$(QEMUFLAGS)
 else
@@ -288,7 +288,7 @@ else
 		-device qemu-xhci \
 		-device usb-kbd \
 		-device usb-tablet \
-		-drive if=pflash,unit=0,format=raw,file=edk2-ovmf-bins/ovmf-code-loongarch64.fd,readonly=on \
+		-drive if=pflash,unit=0,format=raw,file=edk2-bins/ovmf-code-loongarch64.fd,readonly=on \
 		-hda $(IMAGE_NAME).hdd \
 		$(QEMUFLAGS)
 endif
@@ -332,7 +332,7 @@ else
 		$(QEMUFLAGS)
 endif
 
-edk2-ovmf-bins:
+edk2-bins:
 	curl -L $(BOOTLOADER_REPO)/edk2-bins.tar.gz | tar -xz
 
 limine-binary/limine:
@@ -435,4 +435,4 @@ clean:
 .PHONY: distclean
 distclean:
 	$(MAKE) -C kernel distclean
-	rm -rf iso_root *.iso *.hdd limine-binary edk2-ovmf-bins
+	rm -rf iso_root *.iso *.hdd limine-binary edk2-bins
