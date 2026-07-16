@@ -102,13 +102,10 @@ Contributions, bug reports and feature suggestions are welcome.
 
 If you would like to contribute, please open an issue or submit a pull request.
 
----
 
 # Author
 
 **Szatakis**
-
----
 
 # License
 
