@@ -333,7 +333,7 @@ else
 endif
 
 edk2-ovmf-bins:
-	curl -L $(BOOTLOADER_REPO)/edk2-ovmf-bins.tar.gz | tar -xz
+	curl -L $(BOOTLOADER_REPO)/edk2-bins.tar.gz | tar -xz
 
 limine-binary/limine:
 	rm -rf limine-binary
