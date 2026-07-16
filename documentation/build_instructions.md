@@ -7,6 +7,7 @@ This guide explains how to build NasuaOS from source.
 Install the following tools before building:
 
 - Git
+- Curl
 - GCC
 - G++
 - CMake
@@ -90,6 +91,8 @@ Install WSL with either:
 - Debian
 
 ### 2. Install Dependencies
+
+### 3. Instal QEMU on windows (optional)
 
 Inside your Linux distribution, follow the **Ubuntu / Debian** instructions above.
 

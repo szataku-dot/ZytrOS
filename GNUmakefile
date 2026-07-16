@@ -12,7 +12,7 @@ QEMUFLAGS := -m 2G
 override IMAGE_NAME := NasuaOS-$(ARCH)
 override FS_NAME := clawfs_disk
 
-# Wykrywanie WSL
+# Detect WSL
 DEBUG_WSL ?= true
 
 ifeq ($(DEBUG_WSL),true)
@@ -81,14 +81,18 @@ ifeq ($(IS_WSL),1)
 		-cdrom C:\\wsl_target\\$(IMAGE_NAME).iso \
 		-drive id=$(FS_NAME),file=C:\\wsl_target\\$(FS_NAME).img,format=raw,if=none \
 		-device ide-hd,drive=$(FS_NAME),bus=ide.0,unit=0 \
-		$(QEMUFLAGS) \
 		-display sdl,gl=on \
-		-serial stdio
+		-serial stdio \
+		-audiodev sdl,id=snd0 \
+		-machine pcspk-audiodev=snd0 \
+		$(QEMUFLAGS)
 else
 	$(QEMU_X86_64) \
 		-M q35 \
 		-drive if=pflash,unit=0,format=raw,file=edk2-ovmf-bins/ovmf-code-x86_64.fd,readonly=on \
 		-cdrom $(IMAGE_NAME).iso \
+		-audiodev sdl,id=snd0 \
+		-machine pcspk-audiodev=snd0 \
 		$(QEMUFLAGS)
 endif
 
