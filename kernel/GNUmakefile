@@ -6,7 +6,7 @@
 override OUTPUT := kernel
 
 # Target architecture to build for. Default to x86_64.
-ARCH := x86_64
+ARCH ?= x86_64
 
 # Install prefix; /usr/local is a good, standard default pick.
 PREFIX := /usr/local

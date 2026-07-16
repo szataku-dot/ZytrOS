@@ -1,10 +1,12 @@
+-include config.mk
+
 # Nuke built-in rules.
 .SUFFIXES:
 
 BOOTLOADER_REPO=https://github.com/Szatakis/NasuaOS-Bootloader/raw/main
 
 # Target architecture to build for. Default to x86_64.
-ARCH := x86_64
+ARCH ?= x86_64
 
 # Default user QEMU flags. These are appended to the QEMU command calls.
 QEMUFLAGS := -m 2G
@@ -348,7 +350,7 @@ kernel/.deps-obtained:
 
 .PHONY: kernel
 kernel: kernel/.deps-obtained
-	$(MAKE) -C kernel
+	$(MAKE) -C kernel ARCH=$(ARCH)
 
 $(IMAGE_NAME).iso: limine-binary/limine kernel
 	rm -rf iso_root
