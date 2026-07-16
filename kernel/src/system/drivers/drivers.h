@@ -3,9 +3,10 @@
 
 #include "acpi/driver.h"
 #include "apic/driver.h"
-#include "ata/driver.h"
 #include "audio/driver.h"
 #include "cpu/driver.h"
+#include "disk/ata/driver.h"
+#include "disk/ahci/driver.h"
 #include "hpet/driver.h"
 #include "keyboard/driver.h"
 #include "memory/driver.h"
