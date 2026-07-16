@@ -107,15 +107,21 @@ extern "C" void kmain()
     // Główna pętla wywołań
     for (;;) 
     {
-        clear_screen();
-
-        update_gui();
-        update_windows_gui();
-
         handle_keyboard();
-        handle_mouse();
 
-        render_frame();
+        if(redraw) {
+            redraw = false;
+
+            clear_screen();
+
+            update_gui();
+            update_windows_gui();
+
+            handle_keyboard();
+            handle_mouse();
+
+            render_frame();
+        }
 
         asm volatile("hlt");
     }

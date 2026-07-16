@@ -1,5 +1,7 @@
 #include "../driver.h"
 
+#include "system/interrupts/functions/pic.h"
+
 #include "libs/asm/asm.h"
 #include "system/drivers/uart/driver.h"
 #include "kernel/include/logger/logger.hpp"
@@ -12,6 +14,8 @@
 #define PIT_FREQUENCY 100
 
 static volatile uint64_t ticks = 0;
+
+bool redraw = false;
 
 void pit_init()
 {
@@ -31,6 +35,10 @@ void pit_init()
 void pit_handler()
 {
     ticks = ticks + 1;
+
+    redraw = true;
+
+    pic_send_eoi(0);
 }
 
 uint64_t pit_get_ticks()

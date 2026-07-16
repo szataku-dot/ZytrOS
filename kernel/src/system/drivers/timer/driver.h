@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 
+extern bool redraw;
 
 void pit_init();
 void pit_handler();
