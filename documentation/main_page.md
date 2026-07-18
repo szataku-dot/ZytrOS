@@ -4,8 +4,6 @@ Welcome to the official documentation of **NasuaOS** — a hobby operating syste
 
 NasuaOS is an experimental operating system focused on learning, low-level programming, and exploring how modern computers work. The project includes its own kernel, memory management, drivers, and system components written mainly in C++.
 
----
-
 ## About NasuaOS
 
 NasuaOS is designed to be a lightweight and modern operating system created without relying on existing operating system kernels.
@@ -16,8 +14,6 @@ The main goals of NasuaOS are:
 - Understanding hardware and computer architecture
 - Creating custom kernel components
 - Building a simple and efficient system from the ground up
-
----
 
 ## Features
 
@@ -31,8 +27,6 @@ Current and planned features include:
 - Graphics subsystem
 - File system support
 - User applications
-
----
 
 ## Documentation
 
@@ -67,20 +61,5 @@ Guides for developers:
 - Debugging the kernel
 - Contributing to the project
 
----
-
 ## Building NasuaOS
-
-To build NasuaOS, you need:
-
-- x86_64 cross compiler
-- Make or CMake
-- Limine bootloader tools
-- QEMU (recommended for testing)
-
-Example:
-
-```bash
-git clone https://github.com/NasuaOS/NasuaOS.git
-cd NasuaOS
-make
+[🔨 Build Instructions](documentation/build_instructions.md)
