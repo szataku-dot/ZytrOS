@@ -136,7 +136,7 @@ void execute_command(const char *cmd)
             print(" -bootapp                            - Application manager command\n");
             print("    --app \"application_name\"         - (Required) Load and execute selected application\n");
             print("    --list                           - List all available applications\n");
-
+            print(" -cd                                 - Change current working directory\n");
         }
 
         else if (page == 4) 
@@ -167,6 +167,12 @@ void execute_command(const char *cmd)
             print("    --val \"0xHEX\"                    - (Required) Value byte to write\n");
             print(" -asciiart                           - Convert text into large ASCII banner\n");
             print("    --text \"string\"                  - (Required) Text to transform\n");
+            print(" -mkdir                             - Create a new directory\n");
+            print("    --dir_name \"name\"                - (Required) Name of the new directory\n");
+
+
+
+            
         }
 
         else if (page == 6) 
@@ -411,7 +417,14 @@ void execute_command(const char *cmd)
     // 10. Command: mount
     else if(cmd_name_len == 5 && strncmp(cmd, "mount", 5)) 
     {
-        print("not yet");//clawfs_exists();
+        if (clawfs_exists())
+        {
+            print_info("CLAWFS detected.\n");
+        }
+        else
+        {
+            print_error("Disk is not formatted as CLAWFS.\n");
+        }
     }
     // 11. Command: touch
     else if (cmd_name_len == 5 && strncmp(cmd, "touch", 5)) 
@@ -1235,6 +1248,52 @@ void execute_command(const char *cmd)
             {
                 print_error("Directory not found!\n");
             }
+        }
+    }
+    // 28. Command: mkdir
+    else if(cmd_name_len == 5 && strncmp(cmd, "mkdir", 5))
+    {
+        const char* dirname_flag = strstr(args, "--dir_name ");
+
+        if(dirname_flag)
+        {
+            const char* dirname_ptr = dirname_flag + 11;
+
+            char name_buf[64];
+            int i = 0;
+
+            if(*dirname_ptr == '"')
+            {
+                dirname_ptr++;
+
+                while(*dirname_ptr && *dirname_ptr != '"' && i < 63)
+                {
+                    name_buf[i++] = *dirname_ptr++;
+                }
+            }
+            else
+            {
+                while(*dirname_ptr && *dirname_ptr != ' ' && *dirname_ptr != '-' && i < 63)
+                {
+                    name_buf[i++] = *dirname_ptr++;
+                }
+            }
+
+            name_buf[i] = '\0';
+
+            if(i > 0)
+            {
+                clawfs_mkdir(current_path, name_buf);
+            }
+            else
+            {
+                print_error("Error: Directory name cannot be empty!\n");
+            }
+        }
+        else
+        {
+            print_error("Syntax error!\n");
+            print_info("Usage: mkdir --dir_name \"folder_name\"\n");
         }
     }
 

@@ -162,3 +162,19 @@ void clawfs_dir(const char* path) {
         }
     }
 }
+
+bool clawfs_exists()
+{
+    uint8_t buffer[512];
+    disk_read_sector(CLAWFS_START_LBA, buffer);
+
+    CLAWFSHeader* header = (CLAWFSHeader*)buffer;
+
+    if (memcmp(header->signature, "CLAWFS", 6) != 0)
+        return false;
+
+    if (header->version != CLAWFS_VERSION)
+        return false;
+
+    return true;
+}
