@@ -312,3 +312,45 @@ uint32_t parse_hex(const char* str) {
 
     return value;
 }
+
+char* strtok(char* str, const char* delim) {
+    static char* backup_ptr = nullptr;
+    if (str != nullptr) {
+        backup_ptr = str;
+    }
+
+    if (backup_ptr == nullptr || *backup_ptr == '\0') {
+        return nullptr;
+    }
+
+    char* start = backup_ptr;
+    
+    // Szukamy znaku delimetera
+    while (*backup_ptr != '\0') {
+        bool is_delim = false;
+        for (int i = 0; delim[i] != '\0'; i++) {
+            if (*backup_ptr == delim[i]) {
+                is_delim = true;
+                break;
+            }
+        }
+
+        if (is_delim) {
+            *backup_ptr = '\0'; // Zamieniamy delimiter na koniec stringa
+            backup_ptr++;
+            return start;
+        }
+        backup_ptr++;
+    }
+
+    return start;
+}
+
+char* strrchr(const char* str, int c) {
+    const char* last = nullptr;
+    while (*str) {
+        if (*str == (char)c) last = str;
+        str++;
+    }
+    return (char*)last;
+}

@@ -3,158 +3,162 @@
 #include "libs/libc/libc.h"
 #include "system/drivers/disk/ata/driver.h"
 #include "applications/shell/commands.h"
+#include "system/drivers/memory/driver.h"
 
-void clawfs_format()
-{
-    // 1. Formating header (Sektor 100)
-    uint8_t sector_buffer[512] = {0};
-    CLAWFSHeader* header = (CLAWFSHeader*)sector_buffer;
+// --- Funkcje pomocnicze ---
 
-    header->signature[0] = 'C';
-    header->signature[1] = 'L';
-    header->signature[2] = 'A';
-    header->signature[3] = 'W';
-    header->signature[4] = 'F';
-    header->signature[5] = 'S';
-    header->version = CLAWFS_VERSION;
-    header->entryCount = 4;
-
-    disk_write_sector(CLAWFS_START_LBA, sector_buffer);
-
-    uint8_t entries_buffer[512] = {0};
-    CLAWFSEntry* entries = (CLAWFSEntry*)entries_buffer;
-
-    strcpy(entries[0].name, "bin");
-    entries[0].type = CLAWFS_DIRECTORY;
-
-    strcpy(entries[1].name, "dev");
-    entries[1].type = CLAWFS_DIRECTORY;
-
-    strcpy(entries[2].name, "etc");
-    entries[2].type = CLAWFS_DIRECTORY;
-
-    strcpy(entries[3].name, "home");
-    entries[3].type = CLAWFS_DIRECTORY;
-
-    disk_write_sector(CLAWFS_START_LBA + 1, entries_buffer);
+void memclear(void* ptr, size_t size) {
+    uint8_t* p = (uint8_t*)ptr;
+    for(size_t i = 0; i < size; i++) p[i] = 0;
 }
 
-void clawfs_create_file(const char* name)
-{
-    uint8_t header_buffer[512];
-    disk_read_sector(CLAWFS_START_LBA, header_buffer);
-    CLAWFSHeader* header = (CLAWFSHeader*)header_buffer;
+char* next_path_token(char* str, const char* delim) {
+    static char* backup_str = nullptr;
+    if (str != nullptr) backup_str = str;
+    if (backup_str == nullptr) return nullptr;
 
-    uint8_t search_buffer[512];
-    uint32_t current_loaded_sector = 0;
-    CLAWFSEntry* search_entries = nullptr;
+    char* start = backup_str;
+    while (*backup_str == *delim) { backup_str++; start++; }
+    if (*backup_str == '\0') return nullptr;
 
-    for (uint32_t i = 0; i < header->entryCount; i++)
-    {
-        uint32_t required_sector_offset = 1 + (i / 16);
-        uint32_t index_in_sector = i % 16;
-
-        if (current_loaded_sector != required_sector_offset) 
-        {
-            disk_read_sector(CLAWFS_START_LBA + required_sector_offset, search_buffer);
-            current_loaded_sector = required_sector_offset;
-            search_entries = (CLAWFSEntry*)search_buffer;
+    while (*backup_str != '\0') {
+        if (*backup_str == *delim) {
+            *backup_str = '\0';
+            backup_str++;
+            return start;
         }
+        backup_str++;
+    }
+    return start;
+}
 
-        if (strcmp(search_entries[index_in_sector].name, name) == 0) 
-        {
-            print_error("File '");
-            print(name);
-            print("' aleredy exists!\n");
+// --- Logika systemu plików ---
+
+uint32_t find_entry_in_dir(uint32_t dir_sector, const char* name, CLAWFSEntry* out_entry) {
+    uint8_t buffer[512];
+    disk_read_sector(dir_sector, buffer);
+    CLAWFSEntry* entries = (CLAWFSEntry*)buffer;
+
+    for (int i = 0; i < 12; i++) { // 512 / sizeof(CLAWFSEntry) approx 12
+        if (strcmp(entries[i].name, name) == 0) {
+            *out_entry = entries[i];
+            return entries[i].data_sector;
+        }
+    }
+    return 0;
+}
+
+uint32_t next_free_sector = 106; // Zaczynamy od 106, bo 102-105 zajęte przez root
+uint32_t get_next_free_sector() { return next_free_sector++; }
+
+uint32_t get_sector_by_path(const char* path) {
+    if (strcmp(path, "/") == 0) return CLAWFS_ROOT_SECTOR;
+    
+    uint32_t current_dir = CLAWFS_ROOT_SECTOR;
+    char path_copy[128];
+    strcpy(path_copy, path);
+
+    char* token = next_path_token(path_copy, "/");
+    CLAWFSEntry entry;
+
+    while (token != nullptr) {
+        uint32_t next_sector = find_entry_in_dir(current_dir, token, &entry);
+        if (next_sector == 0) return 0;
+        
+        current_dir = entry.data_sector;
+        token = next_path_token(nullptr, "/");
+    }
+    return current_dir;
+}
+
+void setup_entry(CLAWFSEntry* e, const char* name, uint32_t type, uint32_t sector) {
+    memclear(e->name, 28); // WAŻNE: Czyścimy całe pole nazwy!
+    strcpy(e->name, name);
+    e->type = type;
+    e->data_sector = sector;
+    
+    uint8_t zero_buf[512] = {0};
+    disk_write_sector(sector, zero_buf);
+}
+
+void clawfs_format() {
+    // 1. Nagłówek
+    uint8_t buffer[512] = {0};
+    CLAWFSHeader* header = (CLAWFSHeader*)buffer;
+    memcpy(header->signature, "CLAWFS", 6);
+    header->version = CLAWFS_VERSION;
+    disk_write_sector(CLAWFS_START_LBA, buffer);
+
+    // 2. Root (101)
+    uint8_t root_buffer[512] = {0};
+    CLAWFSEntry* entries = (CLAWFSEntry*)root_buffer;
+    setup_entry(&entries[0], "bin", CLAWFS_DIRECTORY, 102);
+    setup_entry(&entries[1], "dev", CLAWFS_DIRECTORY, 103);
+    setup_entry(&entries[2], "etc", CLAWFS_DIRECTORY, 104);
+    setup_entry(&entries[3], "home", CLAWFS_DIRECTORY, 105);
+    disk_write_sector(CLAWFS_ROOT_SECTOR, root_buffer);
+
+    // 3. Podstruktura
+    clawfs_create_file_in("/bin", "kernel_bin");
+    clawfs_mkdir("/home", "user");
+    clawfs_mkdir("/home", "root");
+    
+    print_info("Format complete.\n");
+}
+
+void clawfs_mkdir(const char* parent_path, const char* dir_name) {
+    uint32_t parent_sector = get_sector_by_path(parent_path);
+    if (parent_sector == 0) { print_error("Parent not found!\n"); return; }
+
+    uint8_t buffer[512];
+    disk_read_sector(parent_sector, buffer);
+    CLAWFSEntry* entries = (CLAWFSEntry*)buffer;
+
+    for (int i = 0; i < 12; i++) {
+        if (entries[i].name[0] == '\0') {
+            setup_entry(&entries[i], dir_name, CLAWFS_DIRECTORY, get_next_free_sector());
+            disk_write_sector(parent_sector, buffer);
+            print_info("Dir created.\n");
             return;
         }
     }
-
-    if (header->entryCount >= 128) 
-    {
-        print_error("No space anvible\n");
-        return;
-    }
-
-    uint32_t target_index = header->entryCount;
-    uint32_t sector_offset = 1 + (target_index / 16);
-    uint32_t index_in_sector = target_index % 16;
-
-    uint8_t entries_buffer[512];
-    disk_read_sector(CLAWFS_START_LBA + sector_offset, entries_buffer);
-    CLAWFSEntry* entries = (CLAWFSEntry*)entries_buffer;
-
-    strcpy(entries[index_in_sector].name, name);
-    entries[index_in_sector].type = CLAWFS_FILE;
-
-    disk_write_sector(CLAWFS_START_LBA + sector_offset, entries_buffer);
-
-    header->entryCount++;
-    disk_write_sector(CLAWFS_START_LBA, header_buffer);
-
-    print_info("File created: ");
-    print(name);
-    print("\n");
 }
 
-void clawfs_dir()
-{
-    uint8_t header_buffer[512];
-    disk_read_sector(CLAWFS_START_LBA, header_buffer);
-    CLAWFSHeader* header = (CLAWFSHeader*)header_buffer;
+void clawfs_create_file_in(const char* path, const char* name) {
+    uint32_t target_sector = get_sector_by_path(path);
+    if (target_sector == 0) { print_error("Path not found!\n"); return; }
 
-    uint8_t entries_buffer[512];
-    uint32_t current_loaded_sector = 0;
-    CLAWFSEntry* entries = nullptr;
-
-    for(uint32_t i = 0; i < header->entryCount; i++)
-    {
-        // Dynamic calc where is data
-        uint32_t required_sector_offset = 1 + (i / 16);
-        uint32_t index_in_sector = i % 16;
-
-        // Read sector only if it is not in RAM
-        if (current_loaded_sector != required_sector_offset) 
-        {
-            disk_read_sector(CLAWFS_START_LBA + required_sector_offset, entries_buffer);
-            current_loaded_sector = required_sector_offset;
-            entries = (CLAWFSEntry*)entries_buffer;
-        }
-
-        if(entries[index_in_sector].type == CLAWFS_DIRECTORY)
-        {
-            print("<DIR> ");
-        }
-        else
-        {
-            print("      ");
-        }
-
-        print(entries[index_in_sector].name);
-        print("\n");
-    }
-}
-
-bool clawfs_exists()
-{
     uint8_t buffer[512];
-    disk_read_sector(CLAWFS_START_LBA, buffer);
-    CLAWFSHeader* header = (CLAWFSHeader*)buffer;
+    disk_read_sector(target_sector, buffer);
+    CLAWFSEntry* entries = (CLAWFSEntry*)buffer;
 
-    bool isValid = (
-        header->signature[0] == 'C' &&
-        header->signature[1] == 'L' &&
-        header->signature[2] == 'A' &&
-        header->signature[3] == 'W' &&
-        header->signature[4] == 'F' &&
-        header->signature[5] == 'S' &&
-        header->version == CLAWFS_VERSION
-    );
-
-    if (isValid) 
-    {
-        print("Partition Mounted\n");
+    for (int i = 0; i < 12; i++) {
+        if (entries[i].name[0] == '\0') {
+            memclear(entries[i].name, 28);
+            strcpy(entries[i].name, name);
+            entries[i].type = CLAWFS_FILE;
+            entries[i].data_sector = get_next_free_sector();
+            disk_write_sector(target_sector, buffer);
+            print_info("File created.\n");
+            return;
+        }
     }
-    
-    return isValid;
+}
+
+void clawfs_dir(const char* path) {
+    uint32_t target = get_sector_by_path(path);
+    if (target == 0) { print_error("Dir not found!\n"); return; }
+
+    uint8_t buffer[512];
+    disk_read_sector(target, buffer);
+    CLAWFSEntry* entries = (CLAWFSEntry*)buffer;
+
+    for (int i = 0; i < 12; i++) {
+        if (entries[i].name[0] != '\0') {
+            if (entries[i].type == CLAWFS_DIRECTORY) print("<DIR>  ");
+            else print("       ");
+            print(entries[i].name);
+            print("\n");
+        }
+    }
 }

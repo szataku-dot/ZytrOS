@@ -268,7 +268,7 @@ void execute_command(const char *cmd)
                     }
                 }
 
-                clawfs_create_file(file_name_n);
+                clawfs_create_file_in(current_path, file_name_n);
 
                 print_info("Saved to file ");
                 print(file_name_n);
@@ -406,12 +406,12 @@ void execute_command(const char *cmd)
     // 9. Command: dir
     else if(cmd_name_len == 3 && strncmp(cmd, "dir", 3))
     {
-        clawfs_dir();
+        clawfs_dir(current_path);
     }
     // 10. Command: mount
     else if(cmd_name_len == 5 && strncmp(cmd, "mount", 5)) 
     {
-        clawfs_exists();
+        print("not yet");//clawfs_exists();
     }
     // 11. Command: touch
     else if (cmd_name_len == 5 && strncmp(cmd, "touch", 5)) 
@@ -444,7 +444,7 @@ void execute_command(const char *cmd)
 
             if (i > 0) 
             {
-                clawfs_create_file(name_buf);
+                clawfs_create_file_in(current_path, name_buf);
             } 
             else 
             {
@@ -1191,6 +1191,50 @@ void execute_command(const char *cmd)
 
 
             print_ascii_art(buffer);
+        }
+    }
+    // 27. Command: cd
+    else if(cmd_name_len == 2 && strncmp(cmd, "cd", 2))
+    {
+        // 1. Obsługa "cd" bez argumentów (powrót do home lub wyświetlenie ścieżki)
+        if (args[0] == '\0') {
+            strcpy(current_path, "/home");
+        }
+        // 2. Obsługa "cd ~"
+        else if (strcmp(args, "~") == 0) {
+            strcpy(current_path, "/home");
+        }
+        // 3. Obsługa "cd .."
+        else if (strcmp(args, "..") == 0) {
+            char* last_slash = strrchr(current_path, '/');
+            if (last_slash != nullptr && last_slash != current_path) {
+                *last_slash = '\0'; // Ucinamy ścieżkę do ostatniego slasha
+            } else {
+                strcpy(current_path, "/");
+            }
+        }
+        // 4. Obsługa zmiany katalogu (np. cd /bin lub cd Szatakis)
+        else {
+            char new_path[256];
+        
+            // Jeśli ścieżka zaczyna się od "/", traktuj jako absolutną
+            if (args[0] == '/') {
+                strcpy(new_path, args);
+            } else {
+                // Jeśli relatywna, sklej z obecną ścieżką
+                strcpy(new_path, current_path);
+                if (strcmp(new_path, "/") != 0) strcat(new_path, "/");
+                strcat(new_path, args);
+            }
+
+            // Sprawdź czy folder istnieje (korzystając z Twojego FS)
+            if (get_sector_by_path(new_path) != 0) {
+                strcpy(current_path, new_path);
+            }    
+            else 
+            {
+                print_error("Directory not found!\n");
+            }
         }
     }
 
