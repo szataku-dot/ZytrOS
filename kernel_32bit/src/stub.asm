@@ -1,4 +1,3 @@
-; kernel_32bit/stub.asm
 [bits 32]
 section .text
 global _start
@@ -25,4 +24,4 @@ _start:
     hlt
     jmp .halt
 
-msg db "Hello World!", 0
+msg db "NasuaOS don't support 32-bit CPU", 0
