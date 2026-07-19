@@ -21,7 +21,7 @@ inline constexpr uint32_t COLOR_LIGHT_GRAY          = 0xFFCCCCCC;
 
 // ===== NasuaOS UI CORE =====
 inline constexpr uint32_t COLOR_NASUA_BG            = 0xFF121826;
-inline constexpr uint32_t COLOR_NASUA_TASKBAR       = 0xFF1F2937;
+inline constexpr uint32_t COLOR_NASUA_TASKBAR       = 0xFF010102;
 inline constexpr uint32_t COLOR_NASUA_START_MENU    = 0xFF243142;
 inline constexpr uint32_t COLOR_NASUA_START_MENU_P  = 0xFF151E29;
 inline constexpr uint32_t COLOR_NASUA_DARK          = 0xFF1C242F;

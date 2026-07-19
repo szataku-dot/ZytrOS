@@ -5,9 +5,6 @@
 #include "system/drivers/video/driver.h"
 
 
-#define BACKGROUND_COLOR 0xFFFFFF00
-
-
 void draw_background()
 {
     if(!fb)
@@ -23,19 +20,9 @@ void draw_background()
     {
         for(size_t x = 0; x < fb->width; x++)
         {
-            bb[y * pitch + x] = BACKGROUND_COLOR;
+            bb[y * pitch + x] = COLOR_NASUA_BG;
         }
     }
-
-
-
-    /*
-        Obliczenie skali
-
-        wybieramy większy współczynnik,
-        żeby ekran został całkowicie zakryty
-    */
-
 
     uint32_t scale_x =
         (fb->width << 16) / background_width;
@@ -55,19 +42,6 @@ void draw_background()
     size_t scaled_height =
         (background_height * scale + 0xFFFF) >> 16;
 
-
-
-    /*
-        Lewy dół
-
-        jeśli obraz większy:
-        przycinamy górę/prawą stronę
-
-        jeśli mniejszy:
-        zostaje na dole
-    */
-
-
     int offset_x = 0;
 
     int offset_y =
@@ -76,13 +50,6 @@ void draw_background()
 
     if(offset_y > 0)
         offset_y = 0;
-
-
-
-    /*
-        Skalowanie nearest-neighbor
-    */
-
 
     for(size_t y = 0; y < scaled_height; y++)
     {
