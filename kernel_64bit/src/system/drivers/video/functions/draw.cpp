@@ -123,8 +123,7 @@ void update_start()
     size_t bar_h = 36;
     size_t start_y = fb->height - bar_h;
 
-    // Usunięto fill_block czyszczący, ponieważ update_bottom_bar robi to globalnie
-    draw_start_button(5, start_y + 2);
+    draw_start_button(5, start_y);
 }
 
 void update_time() 
