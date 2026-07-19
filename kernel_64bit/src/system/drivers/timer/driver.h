@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-extern bool redraw;
+extern volatile bool redraw;
 
 void pit_init();
 void pit_handler();

@@ -106,24 +106,22 @@ extern "C" void kmain()
 
     asm volatile("sti");
 
-    // Główna pętla wywołań
+    // Main loop
     for (;;) 
     {
         handle_keyboard();
 
-        if(redraw) {
-            redraw = false;
+        redraw = false;
 
-            clear_screen();
+        clear_screen();
 
-            update_gui();
-            update_windows_gui();
+        update_gui();
+        update_windows_gui();
 
-            handle_keyboard();
-            handle_mouse();
+        handle_keyboard();
+        handle_mouse();
 
-            render_frame();
-        }
+        render_frame();
 
         asm volatile("hlt");
     }

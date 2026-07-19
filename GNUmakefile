@@ -346,17 +346,17 @@ limine-binary/limine:
 		LDFLAGS="$(HOST_LDFLAGS)" \
 		LIBS="$(HOST_LIBS)"
 
-kernel/.deps-obtained:
-	./kernel/get-deps
+kernel_64bit/.deps-obtained:
+	./kernel_64bit/get-deps
 
-.PHONY: kernel
-kernel: kernel/.deps-obtained
-	$(MAKE) -C kernel ARCH=$(ARCH)
+.PHONY: kernel_64bit
+kernel_64bit: kernel_64bit/.deps-obtained
+	$(MAKE) -C kernel_64bit ARCH=$(ARCH)
 
-$(IMAGE_NAME).iso: limine-binary/limine kernel
+$(IMAGE_NAME).iso: limine-binary/limine kernel_64bit
 	rm -rf iso_root
 	mkdir -p iso_root/boot
-	cp -v kernel/bin-$(ARCH)/kernel iso_root/boot/
+	cp -v kernel_64bit/bin-$(ARCH)/kernel_64bit iso_root/boot/
 	mkdir -p iso_root/boot/limine
 	cp -v limine.conf iso_root/boot/limine/
 	mkdir -p iso_root/EFI/BOOT
@@ -400,7 +400,7 @@ ifeq ($(ARCH),loongarch64)
 endif
 	rm -rf iso_root
 
-$(IMAGE_NAME).hdd: limine-binary/limine kernel
+$(IMAGE_NAME).hdd: limine-binary/limine kernel_64bit
 	rm -f $(IMAGE_NAME).hdd
 	dd if=/dev/zero bs=1M count=0 seek=64 of=$(IMAGE_NAME).hdd
 ifeq ($(ARCH),x86_64)
@@ -411,7 +411,7 @@ else
 endif
 	mformat -i $(IMAGE_NAME).hdd@@1M
 	mmd -i $(IMAGE_NAME).hdd@@1M ::/EFI ::/EFI/BOOT ::/boot ::/boot/limine
-	mcopy -i $(IMAGE_NAME).hdd@@1M kernel/bin-$(ARCH)/kernel ::/boot
+	mcopy -i $(IMAGE_NAME).hdd@@1M kernel_64bit/bin-$(ARCH)/kernel_64bit ::/boot
 	mcopy -i $(IMAGE_NAME).hdd@@1M limine.conf ::/boot/limine
 ifeq ($(ARCH),x86_64)
 	mcopy -i $(IMAGE_NAME).hdd@@1M limine-binary/limine-bios.sys ::/boot/limine
@@ -430,10 +430,10 @@ endif
 
 .PHONY: clean
 clean:
-	$(MAKE) -C kernel clean
+	$(MAKE) -C kernel_64bit clean
 	rm -rf iso_root $(IMAGE_NAME).iso $(IMAGE_NAME).hdd
 
 .PHONY: distclean
 distclean:
-	$(MAKE) -C kernel distclean
+	$(MAKE) -C kernel_64bit distclean
 	rm -rf iso_root *.iso *.hdd limine-binary edk2-bins

@@ -14,7 +14,6 @@ void isr_handler(Registers* regs)
     if(regs->vector == 32)
     {
         pit_handler();
-        pic_send_eoi(0);
         return;
     }
 

@@ -15,7 +15,7 @@
 
 static volatile uint64_t ticks = 0;
 
-bool redraw = false;
+volatile bool redraw = false;
 
 void pit_init()
 {
