@@ -1,1 +1,2 @@
 ARCH := x86_64
+SUB_ARCH ?= x86_32

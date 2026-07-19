@@ -7,6 +7,7 @@ BOOTLOADER_REPO=https://github.com/Szatakis/NasuaOS-Bootloader/raw/main
 
 # Target architecture to build for. Default to x86_64.
 ARCH ?= x86_64
+SUB_ARCH ?= x86_32
 
 # Default user QEMU flags. These are appended to the QEMU command calls.
 QEMUFLAGS := -m 2G
@@ -353,10 +354,15 @@ kernel_64bit/.deps-obtained:
 kernel_64bit: kernel_64bit/.deps-obtained
 	$(MAKE) -C kernel_64bit ARCH=$(ARCH)
 
-$(IMAGE_NAME).iso: limine-binary/limine kernel_64bit
+.PHONY: kernel_32bit
+kernel_32bit:
+	$(MAKE) -C kernel_32bit ARCH=$(SUB_ARCH)
+
+$(IMAGE_NAME).iso: limine-binary/limine kernel_64bit kernel_32bit
 	rm -rf iso_root
 	mkdir -p iso_root/boot
 	cp -v kernel_64bit/bin-$(ARCH)/kernel_64bit iso_root/boot/
+	cp -v kernel_32bit/bin-$(SUB_ARCH)/kernel_32bit iso_root/boot/
 	mkdir -p iso_root/boot/limine
 	cp -v limine.conf iso_root/boot/limine/
 	mkdir -p iso_root/EFI/BOOT
@@ -400,7 +406,7 @@ ifeq ($(ARCH),loongarch64)
 endif
 	rm -rf iso_root
 
-$(IMAGE_NAME).hdd: limine-binary/limine kernel_64bit
+$(IMAGE_NAME).hdd: limine-binary/limine kernel_64bit kernel_32bit
 	rm -f $(IMAGE_NAME).hdd
 	dd if=/dev/zero bs=1M count=0 seek=64 of=$(IMAGE_NAME).hdd
 ifeq ($(ARCH),x86_64)
@@ -412,6 +418,7 @@ endif
 	mformat -i $(IMAGE_NAME).hdd@@1M
 	mmd -i $(IMAGE_NAME).hdd@@1M ::/EFI ::/EFI/BOOT ::/boot ::/boot/limine
 	mcopy -i $(IMAGE_NAME).hdd@@1M kernel_64bit/bin-$(ARCH)/kernel_64bit ::/boot
+	mcopy -i $(IMAGE_NAME).hdd@@1M kernel_32bit/bin-$(SUB_ARCH)/kernel_32bit ::/boot
 	mcopy -i $(IMAGE_NAME).hdd@@1M limine.conf ::/boot/limine
 ifeq ($(ARCH),x86_64)
 	mcopy -i $(IMAGE_NAME).hdd@@1M limine-binary/limine-bios.sys ::/boot/limine
@@ -430,10 +437,12 @@ endif
 
 .PHONY: clean
 clean:
+	$(MAKE) -C kernel_32bit clean
 	$(MAKE) -C kernel_64bit clean
 	rm -rf iso_root $(IMAGE_NAME).iso $(IMAGE_NAME).hdd
 
 .PHONY: distclean
 distclean:
+	$(MAKE) -C kernel_32bit clean
 	$(MAKE) -C kernel_64bit distclean
 	rm -rf iso_root *.iso *.hdd limine-binary edk2-bins
