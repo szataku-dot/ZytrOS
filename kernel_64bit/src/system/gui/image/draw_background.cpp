@@ -3,90 +3,123 @@
 #include "system/gui/gui.h"
 #include "system/gui/vars/colors.h"
 #include "system/drivers/video/driver.h"
+#include "system/drivers/memory/driver.h"
 
 
-void draw_background()
+static uint32_t* background_buffer = nullptr;
+
+static size_t background_pitch = 0;
+static size_t background_size = 0;
+
+
+
+void image_init()
 {
     if(!fb)
         return;
 
+    background_pitch =
+        get_backbuffer_pitch();
 
-    uint32_t* bb = get_backbuffer();
-    size_t pitch = get_backbuffer_pitch();
 
 
-    // żółte tło
+    background_size =
+        background_pitch * fb->height * sizeof(uint32_t);
+
+
+
+    background_buffer =
+        (uint32_t*)kmalloc(background_size);
+
+
+
+    if(!background_buffer)
+        return;
+
+
+
+    /*
+        Czyszczenie tła
+    */
+
     for(size_t y = 0; y < fb->height; y++)
     {
         for(size_t x = 0; x < fb->width; x++)
         {
-            bb[y * pitch + x] = COLOR_NASUA_BG;
+            background_buffer[
+                y * background_pitch + x
+            ] = COLOR_NASUA_BG;
         }
     }
 
-    uint32_t scale_x =
-        (fb->width << 16) / background_width;
-
-    uint32_t scale_y =
-        (fb->height << 16) / background_height;
 
 
-    uint32_t scale =
-        (scale_x > scale_y) ? scale_x : scale_y;
+    /*
+        Stretched scaling
+    */
 
-
-
-    size_t scaled_width =
-        (background_width * scale + 0xFFFF) >> 16;
-
-    size_t scaled_height =
-        (background_height * scale + 0xFFFF) >> 16;
-
-    int offset_x = 0;
-
-    int offset_y =
-        fb->height - scaled_height;
-
-
-    if(offset_y > 0)
-        offset_y = 0;
-
-    for(size_t y = 0; y < scaled_height; y++)
+    for(size_t y = 0; y < fb->height; y++)
     {
-        for(size_t x = 0; x < scaled_width; x++)
+
+        size_t src_y =
+            (y * background_height) / fb->height;
+
+
+
+        if(src_y >= background_height)
+            src_y = background_height - 1;
+
+
+
+        for(size_t x = 0; x < fb->width; x++)
         {
 
-            int screen_x =
-                offset_x + x;
-
-            int screen_y =
-                offset_y + y;
-
-
-            if(screen_x < 0 ||
-               screen_y < 0 ||
-               screen_x >= (int)fb->width ||
-               screen_y >= (int)fb->height)
-                continue;
-
-
-
             size_t src_x =
-                (x << 16) / scale;
-
-            size_t src_y =
-                (y << 16) / scale;
+                (x * background_width) / fb->width;
 
 
 
-            bb[
-                screen_y * pitch +
-                screen_x
+            if(src_x >= background_width)
+                src_x = background_width - 1;
+
+
+
+            background_buffer[
+                y * background_pitch + x
             ] =
                 background_data[
                     src_y * background_width +
                     src_x
                 ];
         }
+    }
+}
+
+
+
+
+void draw_background()
+{
+    if(!fb || !background_buffer)
+        return;
+
+
+    uint32_t* bb =
+        get_backbuffer();
+
+
+
+    if(!bb)
+        return;
+
+
+
+    for(size_t y = 0; y < fb->height; y++)
+    {
+        memcpy(
+            bb + y * background_pitch,
+            background_buffer + y * background_pitch,
+            fb->width * sizeof(uint32_t)
+        );
     }
 }

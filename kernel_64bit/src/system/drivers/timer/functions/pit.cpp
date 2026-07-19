@@ -5,6 +5,7 @@
 #include "libs/asm/asm.h"
 #include "system/drivers/uart/driver.h"
 #include "kernel/include/logger/logger.hpp"
+#include "system/drivers/video/driver.h"
 
 
 #define PIT_CHANNEL0 0x40
@@ -15,7 +16,7 @@
 
 static volatile uint64_t ticks = 0;
 
-volatile bool redraw = false;
+volatile bool redraw = true;
 
 void pit_init()
 {
@@ -24,9 +25,16 @@ void pit_init()
 
     uint16_t divisor = PIT_BASE_FREQ / PIT_FREQUENCY;
 
+
     outb(PIT_COMMAND, 0x36);
-    outb(PIT_CHANNEL0,divisor & 0xFF);
+    io_wait();
+
+    outb(PIT_CHANNEL0, divisor & 0xFF);
+    io_wait();
+
     outb(PIT_CHANNEL0, (divisor >> 8) & 0xFF);
+    io_wait();
+
 
     Uart::puts("[PIT] Ready\n");
     log(INFO,"PIT","Ready");
