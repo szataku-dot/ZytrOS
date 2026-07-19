@@ -8,14 +8,15 @@ multiboot_header:
     dd -(0x1BADB002 + 0x00)
 
 _start:
-    mov edi, 0xB8000
-    mov ah, 0x0F
+    mov edi, 0xB8000 + 1760 + 48 
+    
+    mov ah, 0x0C             
     mov esi, msg
 .loop:
-    lodsb
+    lodsb                    
     cmp al, 0
     je .halt
-    mov [edi], ax
+    mov [edi], ax            
     add edi, 2
     jmp .loop
 

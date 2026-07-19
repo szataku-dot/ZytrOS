@@ -4,7 +4,7 @@ OBJ_DIR := obj-$(ARCH)
 BIN_DIR := bin-$(ARCH)
 
 # Zmienne plików
-OBJ := $(OBJ_DIR)/stub.o
+OBJ := $(OBJ_DIR)/boot.o
 BIN := $(BIN_DIR)/kernel_32bit
 
 all: $(BIN)
@@ -15,9 +15,9 @@ $(BIN): $(OBJ)
 	ld -m elf_i386 -Ttext 0x100000 -o $@ $^
 
 # Tworzenie pliku obiektowego
-$(OBJ): src/stub.asm
+$(OBJ): src/boot.asm
 	@mkdir -p $(OBJ_DIR)
-	nasm -f elf32 src/stub.asm -o $@
+	nasm -f elf32 src/boot.asm -o $@
 
 .PHONY: clean
 clean:
