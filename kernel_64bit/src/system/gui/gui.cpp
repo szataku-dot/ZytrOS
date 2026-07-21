@@ -33,7 +33,10 @@ void draw_start_menu_f(int x, int y, int w, int h)
 
 void draw_start_menu() 
 {
-    if (!fb || !is_menu_start_open) return;
+    if (!fb || !is_menu_start_open) 
+    {
+        return;
+    }
 
     menu_x = 0;
     menu_y = fb->height - bar_h_scaled - menu_h;
@@ -43,7 +46,10 @@ void draw_start_menu()
 
 void open_start_menu() 
 {
-    if (!fb) return;
+    if (!fb) 
+    {
+        return;
+    }
     is_menu_start_open = true;
 }
 

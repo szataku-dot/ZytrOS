@@ -21,30 +21,30 @@ ButtonArea start_button = { 0, 0, 0, 0 };
 void draw_start_button(size_t x, size_t taskbar_y)
 {
     constexpr int button_w = 100;
-    constexpr int button_h = 34;
+    const int button_h = 28 + (bar_h_scaled - bar_h);
     constexpr int margin = 2;
 
-    int button_y = taskbar_y + (bar_h_scaled - button_h) / 2;
+    const int button_y = taskbar_y + (bar_h_scaled - button_h) / 2;
 
     start_button.x1 = static_cast<int>(x);
     start_button.y1 = button_y;
     start_button.x2 = static_cast<int>(x + button_w);
     start_button.y2 = button_y + button_h;
 
-    draw_rect(start_button.x1 - margin, start_button.y1,
-              start_button.x2 + margin, start_button.y2,
-              COLOR_SHADOW);
+    draw_rect(start_button.x1 - margin, start_button.y1, start_button.x2 + margin, start_button.y2, COLOR_SHADOW);
 
-    draw_rect(start_button.x1, start_button.y1 + margin,
-              start_button.x2, start_button.y2 - margin,
-              COLOR_HARD_SHADOW);
+    draw_rect(start_button.x1, start_button.y1 + margin, start_button.x2, start_button.y2 - margin, COLOR_HARD_SHADOW);
 
     if(start_hover)
-        draw_icon<32, 32>(start_icon_hover, x, button_y);
+    {
+        draw_icon<32, 32>(start_icon_hover, x, button_y + ((bar_h_scaled - bar_h) / 2));
+    }
     else
-        draw_icon<32, 32>(start_icon, x, button_y);
+    {
+        draw_icon<32, 32>(start_icon, x, button_y + ((bar_h_scaled - bar_h) / 2));
+    }
 
-    print_at10("START", x + 38, button_y + 12, COLOR_WHITE);
+    print_at10("START", x + 38, button_y + ((button_h - 8) / 2), COLOR_WHITE);
 }
 
 void draw_start_menu_system_icons(int x, int y, int p, int w, int h) 

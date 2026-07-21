@@ -11,7 +11,6 @@ static uint32_t* background_buffer = nullptr;
 static size_t background_pitch = 0;
 static size_t background_size = 0;
 
-// Nowa zmienna przechowująca przeskalowaną wysokość paska
 size_t bar_h = 36;
 size_t bar_h_scaled = 0; 
 
@@ -19,41 +18,32 @@ size_t bar_h_scaled = 0;
 void image_init()
 {
     if(!fb)
+    {
         return;
+    }
 
-    background_pitch =
-        get_backbuffer_pitch();
-
-
-    background_size =
-        background_pitch * fb->height * sizeof(uint32_t);
-
-
-    background_buffer =
-        (uint32_t*)kmalloc(background_size);
-
+    background_pitch = get_backbuffer_pitch();
+    background_size = background_pitch * fb->height * sizeof(uint32_t);
+    background_buffer = (uint32_t*)kmalloc(background_size);
 
     if(!background_buffer)
+    {
         return;
+    }
 
-
-    /*
-        Obliczenie nowej wysokości paska po skalowaniu.
-        Mnożymy najpierw, aby uniknąć problemów z dzieleniem liczb całkowitych.
-    */
     bar_h_scaled = (bar_h * fb->height) / 720;
+    if(bar_h > bar_h_scaled)
+    {
+        bar_h = bar_h + bar_h_scaled;
+        bar_h_scaled = bar_h - bar_h_scaled;
+        bar_h = bar_h - bar_h_scaled;
+    }
 
-
-    /*
-        Czyszczenie tła
-    */
     for(size_t y = 0; y < fb->height; y++)
     {
         for(size_t x = 0; x < fb->width; x++)
         {
-            background_buffer[
-                y * background_pitch + x
-            ] = COLOR_NASUA_BG;
+            background_buffer[y * background_pitch + x] = COLOR_NASUA_BG;
         }
     }
 
@@ -63,23 +53,23 @@ void image_init()
     */
     for(size_t y = 0; y < fb->height; y++)
     {
-        size_t src_y =
-            (y * background_height) / fb->height;
+        size_t src_y = (y * background_height) / fb->height;
 
         if(src_y >= background_height)
+        {
             src_y = background_height - 1;
+        }
 
         for(size_t x = 0; x < fb->width; x++)
         {
-            size_t src_x =
-                (x * background_width) / fb->width;
+            size_t src_x = (x * background_width) / fb->width;
 
             if(src_x >= background_width)
+            {
                 src_x = background_width - 1;
+            }
 
-            background_buffer[
-                y * background_pitch + x
-            ] =
+            background_buffer[y * background_pitch + x] =
                 background_data[
                     src_y * background_width +
                     src_x
@@ -91,18 +81,16 @@ void image_init()
 void draw_background()
 {
     if(!fb || !background_buffer)
+    {
         return;
+    }
 
+    uint32_t* bb = get_backbuffer();
 
-    uint32_t* bb =
-        get_backbuffer();
-
-
-
-    if(!bb)
+    if(!bb) 
+    {
         return;
-
-
+    }
 
     for(size_t y = 0; y < fb->height; y++)
     {

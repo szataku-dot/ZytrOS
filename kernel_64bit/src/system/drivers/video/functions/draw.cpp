@@ -166,7 +166,7 @@ void draw_rect(int x1, int y1, int x2, int y2, uint32_t color)
 void update_start() 
 {
     if (!fb) return;
-    draw_start_button(5, fb->height - bar_h_scaled);
+    draw_start_button(6, fb->height - bar_h_scaled);
 }
 
 void update_time() 
