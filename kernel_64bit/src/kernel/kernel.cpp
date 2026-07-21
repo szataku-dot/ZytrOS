@@ -87,12 +87,7 @@ extern "C" void kmain()
 
     Uart::init();
 
-    if(mp_request.response)
-    {
-        Uart::puts("[CPU] MP available\n");
-        log(INFO,"CPU","MP available");
-    }
-
+    init_cpu_cores();
     storage_init();
     memory_init();
     paging_init();
@@ -106,10 +101,6 @@ extern "C" void kmain()
     asm volatile("sti");
 
     image_init();
-
-    print_info("elo");
-    print_warn("elo");
-    print_error("elo");
 
     // Main loop
     for (;;) 
