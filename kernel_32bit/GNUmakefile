@@ -1,28 +1,55 @@
 ARCH ?= x86_32
 
+AS := nasm
+CC := g++
+LD := g++
+
 OBJ_DIR := obj-$(ARCH)
 BIN_DIR := bin-$(ARCH)
 
-# Files varibles
-OBJ := $(OBJ_DIR)/boot.o
+CFLAGS := \
+	-m32 \
+	-ffreestanding \
+	-fno-exceptions \
+	-fno-rtti \
+	-fno-stack-protector \
+	-fno-pic \
+	-fno-pie \
+	-O2 \
+	-Wall \
+	-Wextra \
+	-mno-sse \
+	-mno-sse2
+
+LDFLAGS := \
+	-m32 \
+	-nostdlib \
+	-no-pie
+
+OBJ := \
+	$(OBJ_DIR)/boot.o \
+	$(OBJ_DIR)/kernel.o
+
 BIN := $(BIN_DIR)/kernel_32bit
 
 all: $(BIN)
 
-# Creating output file
-$(BIN): $(OBJ)
+$(BIN): $(OBJ) linker.ld
 	@mkdir -p $(BIN_DIR)
-	ld -m elf_i386 -Ttext 0x100000 -o $@ $^
+	$(LD) $(LDFLAGS) -T linker.ld -o $@ $(OBJ)
 
-# Creating bin file
-$(OBJ): src/boot.asm
+$(OBJ_DIR)/boot.o: src/boot.asm
 	@mkdir -p $(OBJ_DIR)
-	nasm -f elf32 src/boot.asm -o $@
+	$(AS) -f elf32 $< -o $@
 
-.PHONY: clean
+$(OBJ_DIR)/kernel.o: src/kernel.cpp
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
 
-.PHONY: distclean
 distclean:
 	rm -rf obj-* bin-*
+
+.PHONY: all clean distclean
