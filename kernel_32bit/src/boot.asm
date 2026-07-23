@@ -10,14 +10,14 @@ header:
 
 section .text
 global _start
-extern kernel_main
+extern kmain
 
 _start:
     cli
 
     mov esp, stack_top
 
-    call kernel_main
+    call kmain
 
 .hang:
     hlt

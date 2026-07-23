@@ -4,8 +4,6 @@
 volatile uint16_t* vga = (uint16_t*)0xB8000;
 
 uint32_t cursor = 0;
-
-
 char buffer[128];
 
 
@@ -27,19 +25,45 @@ const char keymap[128] =
 };
 
 
+void scroll_screen()
+{
+    for(int y = 1; y < 25; y++)
+    {
+        for(int x = 0; x < 80; x++)
+        {
+            vga[(y - 1) * 80 + x] = vga[y * 80 + x];
+        }
+    }
+
+    for(int x = 0; x < 80; x++)
+    {
+        vga[24 * 80 + x] = (0x07 << 8) | ' ';
+    }
+
+    cursor = 24 * 80;
+}
+
 
 void putchar(char c)
 {
     if(c == '\n')
     {
         cursor = ((cursor / 80) + 1) * 80;
+
+        if(cursor >= 80 * 25)
+            scroll_screen();
+
         return;
     }
 
     vga[cursor] = (0x07 << 8) | c;
     cursor++;
-}
 
+    if(cursor >= 80 * 25)
+    {
+        scroll_screen();
+    }
+}
 
 
 void print(const char* str)
@@ -52,16 +76,28 @@ void print(const char* str)
 }
 
 
+void fetch()
+{
+    print(" _   _                        ____   _____\n"
+          "| \\ | |                      / __ \\ / ____|\n"
+          "|  \\| | __ _ ___ _   _  __ _| |  | | (___\n"
+          "| . ` |/ _` / __| | | |/ _` | |  | |\\___ \\\n"
+          "| |\\  | (_| \\__ \\ |_| | (_| | |__| |____) |\n"
+          "|_| \\_|\\__,_|___/\\__,_|\\__,_|\\____/|_____/\n\n");
+}
+
 
 void clear_screen()
 {
     for(int i=0;i<2000;i++)
+    {
         vga[i] = (0x07 << 8) | ' ';
-
+    }
 
     cursor = 0;
-}
 
+    fetch();
+}
 
 
 void disable_cursor()
@@ -83,11 +119,9 @@ void disable_cursor()
 }
 
 
-
 void keyboard_init()
 {
     uint8_t status;
-
 
     do
     {
@@ -118,7 +152,6 @@ void keyboard_init()
 }
 
 
-
 uint8_t read_scancode()
 {
     uint8_t status;
@@ -147,19 +180,18 @@ uint8_t read_scancode()
 }
 
 
-
 void read_line()
 {
     int pos=0;
-
 
     while(true)
     {
         uint8_t sc = read_scancode();
 
-
         if(sc & 0x80)
+        {
             continue;
+        }
 
 
         if(sc == 0x1C)
@@ -172,12 +204,12 @@ void read_line()
 
         if(sc == 0x0E)
         {
-            if(pos>0)
+            if(pos > 0 && cursor > 0)
             {
                 pos--;
                 cursor--;
 
-                vga[cursor]=(0x07<<8)|' ';
+                vga[cursor] = (0x07 << 8) | ' ';
             }
 
             continue;
@@ -196,7 +228,6 @@ void read_line()
 }
 
 
-
 bool strcmp(const char* a,const char* b)
 {
     while(*a && *b)
@@ -208,18 +239,24 @@ bool strcmp(const char* a,const char* b)
         b++;
     }
 
-
     return *a==0 && *b==0;
 }
-
 
 
 void halt()
 {
     while(true)
+    {
         asm volatile("hlt");
+    }
 }
 
+
+void version()
+{
+    print("NasuaOS 32-bit"
+          "Version: 0.1");
+}
 
 
 void shell()
@@ -227,9 +264,7 @@ void shell()
     while(true)
     {
         print("> ");
-
         read_line();
-
 
         if(strcmp(buffer,"help"))
         {
@@ -238,15 +273,15 @@ void shell()
                 "help\n"
                 "clear\n"
                 "info\n"
+                "fetch\n"
+                "version\n"
                 "halt\n\n"
             );
         }
-
         else if(strcmp(buffer,"clear"))
         {
             clear_screen();
         }
-
         else if(strcmp(buffer,"info"))
         {
             print(
@@ -255,12 +290,18 @@ void shell()
                 "Kernel 32-bit is basic shell not full os\n\n"
             );
         }
-
         else if(strcmp(buffer,"halt"))
         {
             halt();
         }
-
+        else if(strcmp(buffer,"fetch")) 
+        {
+            fetch();
+        }
+        else if(strcmp(buffer,"version"))
+        {
+            version();
+        }
         else
         {
             print("Unknown command\n");
@@ -269,18 +310,12 @@ void shell()
 }
 
 
-
-extern "C"
-void kernel_main()
+extern "C" void kmain()
 {
     disable_cursor();
-
     keyboard_init();
 
-    clear_screen();
-
-
-    print("NasuaOS 32-bit\n");
+    fetch();
 
 
     shell();
