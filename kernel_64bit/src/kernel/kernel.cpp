@@ -81,7 +81,6 @@ extern "C" void kmain()
     }
 
     fb = framebuffer_request.response->framebuffers[0];
-    // Initialize backbuffer with framebuffer dimensions
     init_backbuffer(fb->width, fb->height, fb->pitch);
     init_text_buffer();
 

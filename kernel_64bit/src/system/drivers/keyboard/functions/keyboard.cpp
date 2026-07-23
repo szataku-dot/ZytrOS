@@ -105,12 +105,11 @@ void print_sc(uint8_t scancode)
     Uart::puts("\n");
 }
 
-extern bool debug_mode; // Pobieramy z main.cpp
+extern bool debug_mode;
 
 extern char scancode_to_ascii_normal(uint8_t);
 extern char scancode_to_ascii_shift(uint8_t);
 
-// Funkcja pomocnicza - bezpiecznie usuwa starą komendę z ekranu i rysuje nową
 static void replace_current_command(const char* new_cmd) 
 {
     for (size_t i = 0; i < cmd_idx; i++) 
@@ -155,14 +154,14 @@ void handle_keyboard()
         print_sc(scancode);
     }
 
-    // 1. Obsługa prefiksu rozszerzonego
+    // Obsługa prefiksu rozszerzonego
     if (scancode == 0xE0) 
     {
         extended_scancode = true;
         return; 
     }
 
-    // 2. Przetwarzanie kodów rozszerzonych
+    // Przetwarzanie kodów rozszerzonych
     if (extended_scancode) 
     {
         extended_scancode = false;
@@ -200,7 +199,7 @@ void handle_keyboard()
             return;
         }
 
-        // ARROW KEYS - Mysz LUB przewijanie historii poleceń
+        // ARROW KEYS
         if (scancode == 0x48 || scancode == 0x50 || scancode == 0x4B || scancode == 0x4D) 
         {
             if (shift_pressed) 
@@ -249,7 +248,7 @@ void handle_keyboard()
         return; 
     }
 
-    // 3. Normalne puszczenie klawisza (Break Code)
+    // Normalne puszczenie klawisza (Break Code)
     if (scancode & 0x80) 
     {
         uint8_t rel = scancode & 0x7F;
@@ -261,14 +260,14 @@ void handle_keyboard()
         return;
     }
 
-    // 4. SHIFT DOWN
+    // SHIFT DOWN
     if (scancode == 0x2A || scancode == 0x36) 
     {
         shift_pressed = true;
         return;
     }
 
-    // 5. BACKSPACE
+    // BACKSPACE
     if (scancode == 0x0E) 
     {
         if(active_window)
@@ -290,7 +289,7 @@ void handle_keyboard()
         }
     }
 
-    // 6. ENTER
+    // ENTER
     if (scancode == 0x1C) 
     {
         if (is_mouse_over_start(mouse_x, mouse_y)) 
@@ -310,7 +309,7 @@ void handle_keyboard()
         }
         else if(!is_mouse_over_any_window(mouse_x, mouse_y)) 
         {
-            for (int i = 0; i < 4; i++) // 4 is apps numeber in start menu
+            for (int i = 0; i < 4; i++)
             {
                 if (is_menu_start_open && is_mouse_over_icon(mouse_x, mouse_y, icons_start_x + 50, icons_start_y + i * icons_offset, 250, 32))
                 {
