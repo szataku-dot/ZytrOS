@@ -254,7 +254,7 @@ void halt()
 
 void version()
 {
-    print("NasuaOS 32-bit"
+    print("NasuaOS 32bit"
           "Version: 0.1");
 }
 
